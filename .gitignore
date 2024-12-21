@@ -1,0 +1,86 @@
+# ========== Build / Binaries ==========
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio cache files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code settings
+.vscode/
+
+# Rider / IntelliJ-based IDE
+.idea/
+*.sln.iml
+
+# ========== OS / System files ==========
+# Mac OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+*.swp
+*.swo
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+
+# ========== Logs & Temp ==========
+*.log
+logs/
+*.stacktrace
+*.ncrunch*
+
+# ========== Configuration ==========
+# Secrets / local config (puedes quitar o modificar según tu proyecto)
+appsettings.Development.json
+appsettings.*.local.json
+secrets.json
+
+# ========== Entity Framework Migrations ==========
+# Si estás generando archivos de Snapshot intermedios que no se usan
+# Ej.: MigrationsSnapshot.cs
+# (Generalmente sí se suben, pero por si prefieres excluirlos)
+# *MigrationsSnapshot.cs
+
+# ========== NuGet ==========
+*.nupkg
+# NUGET cache
+**/packages
+# Except build/, which is used as NuGetPackagesDir
+!build/packages/
+
+# ========== Coverage & Test results ==========
+TestResults/
+Coverage/
+*.trx
+*.coverage
+*.coveragexml
+*.testsettings
+*.runsettings
+*.tmh
+
+# ========== Others ==========
+# ReSharper files
+*.DotSettings.user
+*_Resharper.*
+*.DotSettings
+
+# Local tooling
+*.local/
+.env
+
+# Exclude database files (si se generan localmente)
+*.mdf
+*.ldf
+
+# ========== End of .gitignore ==========
