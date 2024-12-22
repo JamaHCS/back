@@ -9,38 +9,17 @@ namespace Domain.DTO
 {
     public record RegisterDTO
     {
-        [Required]
-        [MaxLength(100)]
         public string FirstName { get; init; }
-
-        [MaxLength(100)]
         public string? MiddleName { get; init; }
-
-        [Required]
-        [MaxLength(100)]
         public string LastName { get; init; }
-
-        [Required]
-        [MaxLength(100)]
         public string MotherLastName { get; set; }
-
-        [Required]
-        [MaxLength(250)]
         public string Email { get; init; }
-
-        [Required]
-        [MaxLength (100)]
-        [MinLength(8)]
         public string Password { get; init; }
     }
 
     public record LoginDTO
     {
-        [Required]
         public string Email { get; init; }
-
-        [Required]
-        [MinLength(8)]
         public string Password { get; init; }
     }
 

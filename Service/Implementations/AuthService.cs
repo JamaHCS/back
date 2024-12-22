@@ -30,7 +30,7 @@ namespace Service.Implementations
             {
                 using (_logger.BeginScope(new Dictionary<string, object> { ["LogSubjectId"] = 2 }))
                 {
-                    _logger.LogInformation("User {UserEmail} was not found", request.Email);
+                    _logger.LogInformation("Usuario {UserEmail} no fue encontrado", request.Email);
                 }
             }
 
@@ -38,7 +38,7 @@ namespace Service.Implementations
             {
                 using (_logger.BeginScope(new Dictionary<string, object> { ["LogSubjectId"] = 2 }))
                 {
-                    _logger.LogInformation("User {UserEmail} login failed, wrong credentials", request.Email);
+                    _logger.LogInformation("Usuario {UserEmail} tuvo login fallido, credenciales erroneas", request.Email);
                 }
 
                 return new AuthResult { Success = false, Errors = new[] { "Invalid credentials" } };
@@ -49,7 +49,7 @@ namespace Service.Implementations
 
             using (_logger.BeginScope(new Dictionary<string, object> { ["UserId"] = user.Id, ["LogSubjectId"] = 2 }))
             {
-                _logger.LogInformation("User {UserEmail} logged in", user.Email);
+                _logger.LogInformation("Usuario {UserEmail} loggueado", user.Email);
             }
 
             return new AuthResult { Success = true, Token = token };
@@ -65,7 +65,7 @@ namespace Service.Implementations
             {
                 using (_logger.BeginScope(new Dictionary<string, object> { ["LogSubjectId"] = 2 }))
                 {
-                    _logger.LogInformation("Register failed: {Email}", user.Email);
+                    _logger.LogInformation("Registro fallido: {Email}", user.Email);
                 }
 
                 return new AuthResult { Success = false, Errors = result.Errors.Select(e => e.Description) };
@@ -75,7 +75,7 @@ namespace Service.Implementations
 
             using (_logger.BeginScope(new Dictionary<string, object> { ["UserId"] = user.Id, ["LogSubjectId"] = 2 }))
             {
-                _logger.LogInformation("User {UserEmail} registered", user.Email);
+                _logger.LogInformation("Usuario {UserEmail} registrado", user.Email);
             }
 
             return new AuthResult { Success = true, Token = token };

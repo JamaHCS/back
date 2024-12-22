@@ -8,21 +8,10 @@ namespace Domain.Entities
 {
     public class AppUser: IdentityUser<Guid>
     {
-        [Required]
-        [MaxLength(100)]
         public string FirstName { get; set; }
-
-        [MaxLength(100)]
         public string MiddleName { get; set; } 
-
-        [Required]
-        [MaxLength(100)]
         public string LastName { get; set; }
-
-        [Required]
-        [MaxLength(100)]
-        public string MotherLastName { get; set; }
-        
+        public string MotherLastName { get; set; }        
         public DateTime DateOfBirth { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public Guid? CreatedBy { get; set; }

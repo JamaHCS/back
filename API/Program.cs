@@ -7,9 +7,19 @@ using Serilog.Sinks.MSSqlServer;
 using System.Data;
 using System.Collections.ObjectModel;
 using Serilog.Events;
+using API.Validations;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using System.Globalization;
 
+CultureInfo cultureInfo = new CultureInfo("es");
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
+
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+ValidatorOptions.Global.LanguageManager = new SpanishLanguageManager();
+ValidatorOptions.Global.LanguageManager.Culture = cultureInfo;
 
 var columnOptions = new ColumnOptions
 {
@@ -53,9 +63,16 @@ try
     builder.Services.AddAuthenticationConf(configuration);
     builder.Services.registerRepositories();
     builder.Services.registerServices();
-    builder.Services.AddControllers();
+    builder.Services.AddControllers(options =>
+    {
+        options.ModelValidatorProviders.Clear();
+    });
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+    builder.Services.AddFluentValidationAutoValidation();
+    builder.Services.AddFluentValidationClientsideAdapters();
+    builder.Services.addFluentValidations();
+
 
     var app = builder.Build();
 
