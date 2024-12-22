@@ -11,6 +11,7 @@ using API.Validations;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using System.Globalization;
+using API.Middlewares;
 
 CultureInfo cultureInfo = new CultureInfo("es");
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -24,16 +25,18 @@ ValidatorOptions.Global.LanguageManager.Culture = cultureInfo;
 var columnOptions = new ColumnOptions
 {
     AdditionalColumns = new Collection<SqlColumn>
-            {
-                new SqlColumn("UserId", SqlDbType.UniqueIdentifier)
-                {
-                    AllowNull = true
-                },
-                new SqlColumn("LogSubjectId", SqlDbType.Int)
-                {
-                    AllowNull = false
-                }
-            }
+        {
+            new SqlColumn("UserId", SqlDbType.UniqueIdentifier, true),
+            new SqlColumn("LogSubjectId", SqlDbType.Int, false),
+            new SqlColumn("RequestId", SqlDbType.NVarChar, true),
+            new SqlColumn("ClientIp", SqlDbType.NVarChar, true),
+            new SqlColumn("UserAgent", SqlDbType.NVarChar, true),
+            new SqlColumn("UserRole", SqlDbType.NVarChar, true),
+            new SqlColumn("ServiceName", SqlDbType.NVarChar, true),
+            new SqlColumn("MethodName", SqlDbType.NVarChar, true),
+            new SqlColumn("Path", SqlDbType.NVarChar, true),
+            new SqlColumn("Method", SqlDbType.NVarChar, true)
+        }
 };
 
 Log.Logger = new LoggerConfiguration()
@@ -75,6 +78,7 @@ try
 
     var app = builder.Build();
 
+    app.UseMiddleware<LogContextMiddleware>();
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseHttpsRedirection();

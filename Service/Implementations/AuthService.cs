@@ -2,6 +2,7 @@
 using Domain.DTO.Auth;
 using Domain.Entities.Auth;
 using Domain.Entities.Global;
+using Domain.Entities.Log;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Service.Interfaces;
@@ -29,7 +30,7 @@ namespace Service.Implementations
 
             if(user is null)
             {
-                using (_logger.BeginScope(new Dictionary<string, object> { ["LogSubjectId"] = 2 }))
+                using (_logger.BeginScope(LogContextManager.ToDictionary()))
                 {
                     _logger.LogInformation("Usuario {UserEmail} no fue encontrado", request.Email);
                 }
@@ -37,7 +38,7 @@ namespace Service.Implementations
 
             if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
             {
-                using (_logger.BeginScope(new Dictionary<string, object> { ["LogSubjectId"] = 2 }))
+                using (_logger.BeginScope(LogContextManager.ToDictionary()))
                 {
                     _logger.LogInformation("Usuario {UserEmail} no pudo ingresar, credenciales erroneas", request.Email);
                 }
@@ -48,7 +49,7 @@ namespace Service.Implementations
 
             var token = _jwtGenerator.GenerateToken(user);
 
-            using (_logger.BeginScope(new Dictionary<string, object> { ["UserId"] = user.Id, ["LogSubjectId"] = 2 }))
+            using (_logger.BeginScope(LogContextManager.ToDictionary(user.Id)))
             {
                 _logger.LogInformation("Usuario {UserEmail} loggueado", user.Email);
             }
@@ -64,7 +65,7 @@ namespace Service.Implementations
 
             if (!result.Succeeded)
             {
-                using (_logger.BeginScope(new Dictionary<string, object> { ["LogSubjectId"] = 2 }))
+                using (_logger.BeginScope(LogContextManager.ToDictionary()))
                 {
                     _logger.LogInformation("Registro fallido: {Email}", user.Email);
                 }
@@ -74,7 +75,7 @@ namespace Service.Implementations
 
             var token = _jwtGenerator.GenerateToken(user);
 
-            using (_logger.BeginScope(new Dictionary<string, object> { ["UserId"] = user.Id, ["LogSubjectId"] = 2 }))
+            using (_logger.BeginScope(LogContextManager.ToDictionary(user.Id)))
             {
                 _logger.LogInformation("Usuario {UserEmail} registrado", user.Email);
             }

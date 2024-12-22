@@ -56,7 +56,15 @@ namespace Repository.Context
                 entity.Property(e => e.Exception).HasColumnName("Exception").IsRequired(false);
                 entity.Property(e => e.Properties).HasColumnName("Properties").IsRequired(false);
                 entity.Property(e => e.LogSubjectId).HasColumnName("LogSubjectId").HasDefaultValue(1);
+                entity.Property(e => e.RequestId).HasColumnName("RequestId").IsRequired(false);
+                entity.Property(e => e.ClientIp).HasColumnName("ClientIp").IsRequired(false);
+                entity.Property(e => e.UserAgent).HasColumnName("UserAgent").IsRequired(false);
+                entity.Property(e => e.UserRole).HasColumnName("UserRole").IsRequired(false);
+                entity.Property(e => e.ServiceName).HasColumnName("ServiceName").IsRequired(false);
+                entity.Property(e => e.MethodName).HasColumnName("MethodName").IsRequired(false);
                 entity.Property(e => e.UserId).HasColumnName("UserId").IsRequired(false).HasColumnType("uniqueidentifier");
+                entity.Property(e => e.Path).HasColumnName("Path").IsRequired(false);
+                entity.Property(e => e.Method).HasColumnName("Method").IsRequired(false);
 
                 entity.HasOne(e => e.User).WithMany(u => u.Logs).HasForeignKey(e => e.UserId).IsRequired(false);
                 entity.HasOne(e => e.LogSubject).WithMany(s => s.LogEvents).HasForeignKey(e => e.LogSubjectId);

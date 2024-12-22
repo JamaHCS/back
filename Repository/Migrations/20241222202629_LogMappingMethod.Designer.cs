@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.Context;
 
@@ -11,9 +12,11 @@ using Repository.Context;
 namespace Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241222202629_LogMappingMethod")]
+    partial class LogMappingMethod
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,8 +173,7 @@ namespace Repository.Migrations
                         .HasColumnName("MessageTemplate");
 
                     b.Property<string>("Method")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Method");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MethodName")
                         .HasColumnType("nvarchar(max)")
@@ -179,7 +181,7 @@ namespace Repository.Migrations
 
                     b.Property<string>("Path")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Path");
+                        .HasColumnName("Method");
 
                     b.Property<string>("Properties")
                         .HasColumnType("nvarchar(max)")
@@ -215,7 +217,11 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Logs", "pim");
+                    b.ToTable("Logs", "pim", t =>
+                        {
+                            t.Property("Method")
+                                .HasColumnName("Method1");
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Log.LogSubject", b =>
