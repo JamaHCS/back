@@ -1,5 +1,4 @@
-﻿using Domain.DTO;
-using Domain.Validations;
+﻿using Domain.DTO.Auth;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 

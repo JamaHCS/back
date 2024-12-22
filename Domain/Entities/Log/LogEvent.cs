@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities.Log
+﻿using Domain.Entities.Auth;
+
+namespace Domain.Entities.Log
 {
     public record LogEvent
     {

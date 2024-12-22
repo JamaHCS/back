@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.DTO;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace Domain.Validations
+namespace Domain.DTO.Auth
 {
+    public record LoginDTO
+    {
+        public string Email { get; init; }
+        public string Password { get; init; }
+    }
+
     public class LoginDtoValidator : AbstractValidator<LoginDTO>
     {
-        public LoginDtoValidator() 
+        public LoginDtoValidator()
         {
             RuleFor(x => x.Email)
                .NotEmpty().WithMessage("El correo electrónico es obligatorio.");

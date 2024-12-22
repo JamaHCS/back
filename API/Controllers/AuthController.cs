@@ -1,7 +1,4 @@
-﻿using Domain.DTO;
-using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.Data;
+﻿using Domain.DTO.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 
@@ -23,10 +20,7 @@ namespace API.Controllers
         {
             var result = await _authService.Register(request);
 
-            if (!result.Success)
-                return BadRequest(result.Errors);
-
-            return Ok(result);
+            return StatusCode(result.Status, result);
         }
 
         [HttpPost("login")]
@@ -34,10 +28,7 @@ namespace API.Controllers
         {
             var result = await _authService.Login(request);
 
-            if (!result.Success)
-                return Unauthorized(result.Errors);
-
-            return Ok(result);
+            return StatusCode(result.Status, result);
         }
 
     }

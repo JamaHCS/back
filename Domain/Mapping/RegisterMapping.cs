@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using Domain.DTO;
-using Domain.Entities;
+﻿using AutoMapper;
+using Domain.DTO.Auth;
+using Domain.Entities.Auth;
 
 namespace Domain.Mapping
 {

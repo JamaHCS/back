@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Domain.DTO;
-using Domain.Entities;
+using Domain.DTO.Auth;
+using Domain.Entities.Auth;
+using Domain.Entities.Global;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Service.Interfaces;
@@ -22,7 +23,7 @@ namespace Service.Implementations
             _logger = logger;
         }
 
-        public async Task<AuthResult> Login(LoginDTO request)
+        public async Task<Result<TokenResponse?>> Login(LoginDTO request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
 
@@ -41,7 +42,7 @@ namespace Service.Implementations
                     _logger.LogInformation("Usuario {UserEmail} tuvo login fallido, credenciales erroneas", request.Email);
                 }
 
-                return new AuthResult { Success = false, Errors = new[] { "Invalid credentials" } };
+                return Result.Failure<TokenResponse?>("Usuario {{userEmail}} tuvo login fallido, credenciales erroneas".Replace("{{userEmail}}", request.Email), 401);
             }
             
 
@@ -52,10 +53,10 @@ namespace Service.Implementations
                 _logger.LogInformation("Usuario {UserEmail} loggueado", user.Email);
             }
 
-            return new AuthResult { Success = true, Token = token };
+           return Result.Ok<TokenResponse?>(new TokenResponse { Token = token }, 200);
         }
 
-        public async Task<AuthResult> Register(RegisterDTO request)
+        public async Task<Result<TokenResponse?>> Register(RegisterDTO request)
         {
             var user = _mapper.Map<AppUser>(request);
 
@@ -68,7 +69,7 @@ namespace Service.Implementations
                     _logger.LogInformation("Registro fallido: {Email}", user.Email);
                 }
 
-                return new AuthResult { Success = false, Errors = result.Errors.Select(e => e.Description) };
+                return Result.Failure<TokenResponse?>("Registro fallido", 400);
             }
 
             var token = _jwtGenerator.GenerateToken(user);
@@ -78,7 +79,7 @@ namespace Service.Implementations
                 _logger.LogInformation("Usuario {UserEmail} registrado", user.Email);
             }
 
-            return new AuthResult { Success = true, Token = token };
+            return Result.Ok<TokenResponse?>(new TokenResponse { Token = token }, 200);
         }
     }
 }

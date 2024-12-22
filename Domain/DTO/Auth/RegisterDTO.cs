@@ -1,9 +1,17 @@
-﻿
-using Domain.DTO;
-using FluentValidation;
+﻿using FluentValidation;
 
-namespace Domain.Validations
+namespace Domain.DTO.Auth
 {
+    public record RegisterDTO
+    {
+        public string FirstName { get; init; }
+        public string? MiddleName { get; init; }
+        public string LastName { get; init; }
+        public string MotherLastName { get; set; }
+        public string Email { get; init; }
+        public string Password { get; init; }
+    }
+
     public class RegisterDtoValidator : AbstractValidator<RegisterDTO>
     {
         public RegisterDtoValidator()

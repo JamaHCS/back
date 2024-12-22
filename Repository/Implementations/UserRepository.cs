@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Entities;
+﻿using Domain.Entities.Auth;
 using Microsoft.AspNetCore.Identity;
 using Repository.Interfaces;
 
@@ -18,7 +13,7 @@ namespace Repository.Implementations
             _userManager = userManager;
         }
 
-        public async Task<AppUser> GetByEmail(string email)
+        public async Task<AppUser?> GetByEmail(string email)
         {
             return await _userManager.FindByEmailAsync(email);
         }
