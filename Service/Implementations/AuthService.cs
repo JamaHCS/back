@@ -39,10 +39,10 @@ namespace Service.Implementations
             {
                 using (_logger.BeginScope(new Dictionary<string, object> { ["LogSubjectId"] = 2 }))
                 {
-                    _logger.LogInformation("Usuario {UserEmail} tuvo login fallido, credenciales erroneas", request.Email);
+                    _logger.LogInformation("Usuario {UserEmail} no pudo ingresar, credenciales erroneas", request.Email);
                 }
 
-                return Result.Failure<TokenResponse?>("Usuario {{userEmail}} tuvo login fallido, credenciales erroneas".Replace("{{userEmail}}", request.Email), 401);
+                return Result.Failure<TokenResponse?>("Login fallido, credenciales erroneas", 401);
             }
             
 

@@ -73,7 +73,6 @@ try
     builder.Services.AddFluentValidationClientsideAdapters();
     builder.Services.addFluentValidations();
 
-
     var app = builder.Build();
 
     app.UseSwagger();
