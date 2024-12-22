@@ -15,9 +15,8 @@ var columnOptions = new ColumnOptions
 {
     AdditionalColumns = new Collection<SqlColumn>
             {
-                new SqlColumn("User", SqlDbType.VarChar)
+                new SqlColumn("UserId", SqlDbType.UniqueIdentifier)
                 {
-                    DataLength = 50,
                     AllowNull = true
                 },
                 new SqlColumn("LogSubjectId", SqlDbType.Int)

@@ -11,7 +11,6 @@ namespace Service.Extensions
         public static void registerServices(this IServiceCollection services)
         {
             services.AddScoped<IJwtGenerator, JwtGenerator>();
-
             services.AddScoped<IAuthService, AuthService>();
         }
     }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Domain.DTO;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Service.Interfaces;
 
 namespace Service.Implementations
@@ -16,25 +12,45 @@ namespace Service.Implementations
         private readonly UserManager<AppUser> _userManager;
         private readonly IJwtGenerator _jwtGenerator;
         private readonly IMapper _mapper;
+        private readonly ILogger<AuthService> _logger;
 
-
-        public AuthService(UserManager<AppUser> userManager, IJwtGenerator jwtGenerator, IMapper mapper)
+        public AuthService(UserManager<AppUser> userManager, IJwtGenerator jwtGenerator, IMapper mapper, ILogger<AuthService> logger)
         {
             _userManager = userManager;
             _jwtGenerator = jwtGenerator;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<AuthResult> Login(LoginDTO request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
 
-            if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
+            if(user is null)
             {
-                return new AuthResult { Success = false, Errors = new[] { "Invalid credentials" } };
+                using (_logger.BeginScope(new Dictionary<string, object> { ["LogSubjectId"] = 2 }))
+                {
+                    _logger.LogInformation("User {UserEmail} was not found", request.Email);
+                }
             }
 
+            if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
+            {
+                using (_logger.BeginScope(new Dictionary<string, object> { ["LogSubjectId"] = 2 }))
+                {
+                    _logger.LogInformation("User {UserEmail} login failed, wrong credentials", request.Email);
+                }
+
+                return new AuthResult { Success = false, Errors = new[] { "Invalid credentials" } };
+            }
+            
+
             var token = _jwtGenerator.GenerateToken(user);
+
+            using (_logger.BeginScope(new Dictionary<string, object> { ["UserId"] = user.Id, ["LogSubjectId"] = 2 }))
+            {
+                _logger.LogInformation("User {UserEmail} logged in", user.Email);
+            }
 
             return new AuthResult { Success = true, Token = token };
         }
@@ -47,10 +63,20 @@ namespace Service.Implementations
 
             if (!result.Succeeded)
             {
+                using (_logger.BeginScope(new Dictionary<string, object> { ["LogSubjectId"] = 2 }))
+                {
+                    _logger.LogInformation("Register failed: {Email}", user.Email);
+                }
+
                 return new AuthResult { Success = false, Errors = result.Errors.Select(e => e.Description) };
             }
 
             var token = _jwtGenerator.GenerateToken(user);
+
+            using (_logger.BeginScope(new Dictionary<string, object> { ["UserId"] = user.Id, ["LogSubjectId"] = 2 }))
+            {
+                _logger.LogInformation("User {UserEmail} registered", user.Email);
+            }
 
             return new AuthResult { Success = true, Token = token };
         }

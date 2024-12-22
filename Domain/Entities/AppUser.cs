@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Domain.common;
+using Domain.Entities.Log;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -32,5 +33,6 @@ namespace Domain.Entities
         public DateTime? DeletedAt { get; set; }
         public bool Deleted { get; set; }
         public string FullName => $"{FirstName} {LastName}";
+        public ICollection<LogEvent> Logs { get; set; } = new List<LogEvent>();
     }
 }

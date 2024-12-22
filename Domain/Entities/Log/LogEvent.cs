@@ -9,8 +9,9 @@
         public DateTimeOffset? TimeStamp { get; init; }
         public string? Exception { get; init; }
         public string? Properties { get; init; }
-        public string? User { get; init; }
+        public Guid? UserId { get; init; }
         public int LogSubjectId { get; init; }
         public LogSubject LogSubject { get; init; }
+        public AppUser? User { get; init; }
     }
 }

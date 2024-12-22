@@ -35,7 +35,9 @@ namespace Repository.Context
             {
                 entity.ToTable("LogSubjects");
                 entity.HasKey(s => s.Id);
+
                 entity.HasMany(s => s.LogEvents).WithOne(le => le.LogSubject).HasForeignKey(le => le.LogSubjectId);
+
                 entity.HasData(
                     new LogSubject { Id = 1, Description = "System" },
                     new LogSubject { Id = 2, Description = "User" }
@@ -45,15 +47,18 @@ namespace Repository.Context
             modelBuilder.Entity<LogEvent>(entity =>
             {
                 entity.ToTable("Logs");          
-                entity.HasKey(e => e.Id);        
+                entity.HasKey(e => e.Id);
+                
                 entity.Property(e => e.Message).HasColumnName("Message").IsRequired(false);
                 entity.Property(e => e.MessageTemplate).HasColumnName("MessageTemplate").IsRequired(false);
                 entity.Property(e => e.Level).HasColumnName("Level").IsRequired(false);
                 entity.Property(e => e.TimeStamp).HasColumnName("TimeStamp").IsRequired(false);
                 entity.Property(e => e.Exception).HasColumnName("Exception").IsRequired(false);
                 entity.Property(e => e.Properties).HasColumnName("Properties").IsRequired(false);
-                entity.Property(e => e.User).HasColumnName("User").IsRequired(false);
                 entity.Property(e => e.LogSubjectId).HasColumnName("LogSubjectId").HasDefaultValue(1);
+                entity.Property(e => e.UserId).HasColumnName("UserId").IsRequired(false).HasColumnType("uniqueidentifier");
+
+                entity.HasOne(e => e.User).WithMany(u => u.Logs).HasForeignKey(e => e.UserId).IsRequired(false);
                 entity.HasOne(e => e.LogSubject).WithMany(s => s.LogEvents).HasForeignKey(e => e.LogSubjectId);
             });
 
@@ -61,11 +66,14 @@ namespace Repository.Context
             {
                 entity.ToTable("Users");
                 entity.HasKey(b => b.Id);
+
                 entity.Property(b => b.FirstName).HasMaxLength(100).IsRequired();
                 entity.Property(b => b.LastName).HasMaxLength(100).IsRequired();
                 entity.Property(b => b.MiddleName).HasMaxLength(100).IsRequired(false);
                 entity.Property(b => b.MotherLastName).HasMaxLength(100).IsRequired();
                 entity.Property(b => b.DateOfBirth).IsRequired();
+
+                entity.HasMany(u => u.Logs).WithOne(l => l.User).HasForeignKey(l => l.UserId);
             });
         }
     }
