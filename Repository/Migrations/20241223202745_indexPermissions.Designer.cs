@@ -12,8 +12,8 @@ using Repository.Context;
 namespace Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241222040317_LogMappingNullable")]
-    partial class LogMappingNullable
+    [Migration("20241223202745_indexPermissions")]
+    partial class indexPermissions
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,7 +26,7 @@ namespace Repository.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Entities.AppUser", b =>
+            modelBuilder.Entity("Domain.Entities.Auth.AppUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -135,7 +135,7 @@ namespace Repository.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("Users", "pim");
+                    b.ToTable("AspNetUsers", "pim");
                 });
 
             modelBuilder.Entity("Domain.Entities.Log.LogEvent", b =>
@@ -146,6 +146,10 @@ namespace Repository.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ClientIp")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ClientIp");
+
                     b.Property<string>("Exception")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Exception");
@@ -154,7 +158,7 @@ namespace Repository.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Level");
 
-                    b.Property<int>("LogSubjectId")
+                    b.Property<int?>("LogSubjectId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(1)
@@ -168,21 +172,51 @@ namespace Repository.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("MessageTemplate");
 
+                    b.Property<string>("Method")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Method");
+
+                    b.Property<string>("MethodName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("MethodName");
+
+                    b.Property<string>("Path")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Path");
+
                     b.Property<string>("Properties")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Properties");
+
+                    b.Property<string>("RequestId")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("RequestId");
+
+                    b.Property<string>("ServiceName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ServiceName");
 
                     b.Property<DateTimeOffset?>("TimeStamp")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("TimeStamp");
 
-                    b.Property<string>("User")
+                    b.Property<string>("UserAgent")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("User");
+                        .HasColumnName("UserAgent");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("UserId");
+
+                    b.Property<string>("UserRole")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("UserRole");
 
                     b.HasKey("Id");
 
                     b.HasIndex("LogSubjectId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Logs", "pim");
                 });
@@ -216,7 +250,7 @@ namespace Repository.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
+            modelBuilder.Entity("Domain.Entities.Roles.AppRole", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -224,6 +258,25 @@ namespace Repository.Migrations
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -234,6 +287,12 @@ namespace Repository.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
@@ -242,6 +301,65 @@ namespace Repository.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", "pim");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Roles.Permission", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Permissions", "pim");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c5d66e00-5996-4ec8-88c0-c916fa8ac460"),
+                            Description = "Permite crear usuarios",
+                            Name = "createUser"
+                        },
+                        new
+                        {
+                            Id = new Guid("b81d305c-71ba-4f98-a03f-d8cabf4d12c0"),
+                            Description = "Permite leer usuarios",
+                            Name = "readUser"
+                        },
+                        new
+                        {
+                            Id = new Guid("be500f26-19f5-42f5-be61-7db2060363c8"),
+                            Description = "Permite desactivar usuarios",
+                            Name = "disableUsers"
+                        });
+                });
+
+            modelBuilder.Entity("Domain.Entities.Roles.RolePermission", b =>
+                {
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("RoleId", "PermissionId");
+
+                    b.HasIndex("PermissionId");
+
+                    b.ToTable("RolePermissions", "pim");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -351,16 +469,39 @@ namespace Repository.Migrations
                 {
                     b.HasOne("Domain.Entities.Log.LogSubject", "LogSubject")
                         .WithMany("LogEvents")
-                        .HasForeignKey("LogSubjectId")
+                        .HasForeignKey("LogSubjectId");
+
+                    b.HasOne("Domain.Entities.Auth.AppUser", "User")
+                        .WithMany("Logs")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("LogSubject");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Roles.RolePermission", b =>
+                {
+                    b.HasOne("Domain.Entities.Roles.Permission", "Permission")
+                        .WithMany()
+                        .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("LogSubject");
+                    b.HasOne("Domain.Entities.Roles.AppRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                    b.HasOne("Domain.Entities.Roles.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -369,7 +510,7 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Domain.Entities.AppUser", null)
+                    b.HasOne("Domain.Entities.Auth.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -378,7 +519,7 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("Domain.Entities.AppUser", null)
+                    b.HasOne("Domain.Entities.Auth.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -387,13 +528,13 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                    b.HasOne("Domain.Entities.Roles.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.AppUser", null)
+                    b.HasOne("Domain.Entities.Auth.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -402,11 +543,16 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("Domain.Entities.AppUser", null)
+                    b.HasOne("Domain.Entities.Auth.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.Auth.AppUser", b =>
+                {
+                    b.Navigation("Logs");
                 });
 
             modelBuilder.Entity("Domain.Entities.Log.LogSubject", b =>

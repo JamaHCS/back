@@ -1,6 +1,4 @@
-﻿using Domain.Entities.Global;
-
-namespace Domain.Entities.Roles
+﻿namespace Domain.Entities.Roles
 {
     public class Permission
     {

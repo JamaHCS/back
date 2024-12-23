@@ -132,7 +132,7 @@ namespace Repository.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("Users", "pim");
+                    b.ToTable("AspNetUsers", "pim");
                 });
 
             modelBuilder.Entity("Domain.Entities.Log.LogEvent", b =>
@@ -211,9 +211,14 @@ namespace Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LogSubjectId");
+                    b.HasIndex("LogSubjectId")
+                        .HasDatabaseName("IX_Logs_LogSubjectId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("TimeStamp")
+                        .HasDatabaseName("IX_Logs_TimeStamp");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_Logs_UserId");
 
                     b.ToTable("Logs", "pim");
                 });
@@ -308,15 +313,40 @@ namespace Repository.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Permissions", "pim");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("6db40991-66fa-4532-8d8d-8428efb07ed7"),
+                            Description = "Permite crear usuarios",
+                            Name = "createUser"
+                        },
+                        new
+                        {
+                            Id = new Guid("a8867344-2aac-4c87-92dd-4a962fee4f6a"),
+                            Description = "Permite leer usuarios",
+                            Name = "readUser"
+                        },
+                        new
+                        {
+                            Id = new Guid("2bd4295d-7e20-4cd8-a50e-8aca83162bdc"),
+                            Description = "Permite desactivar usuarios",
+                            Name = "disableUsers"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Roles.RolePermission", b =>

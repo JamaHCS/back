@@ -3,12 +3,14 @@ using Domain.Entities.Log;
 using Domain.Entities.Roles;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Repository.Context
 {
     public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     {
         public DbSet<LogEvent> LogEvents { get; set; } = null!;
+        public DbSet<LogSubject> LogSubjects { get; set; } = null!;
         public DbSet<Permission> Permissions { get; set; } = default!;
         public DbSet<RolePermission> RolePermissions { get; set; } = default!;
 
@@ -21,9 +23,10 @@ namespace Repository.Context
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            {
                 optionsBuilder.UseSqlServer("Server=contafacil.tech\\MSSQLSERVER2012;Database=pim;Uid=pim;Pwd=r45l7fB_1;Trust Server Certificate=true");
-            }
+
+            optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -69,11 +72,14 @@ namespace Repository.Context
 
                 entity.HasOne(e => e.User).WithMany(u => u.Logs).HasForeignKey(e => e.UserId).IsRequired(false);
                 entity.HasOne(e => e.LogSubject).WithMany(s => s.LogEvents).HasForeignKey(e => e.LogSubjectId);
+
+                entity.HasIndex(e => e.LogSubjectId).HasDatabaseName("IX_Logs_LogSubjectId");
+                entity.HasIndex(e => e.UserId).HasDatabaseName("IX_Logs_UserId");
+                entity.HasIndex(e => e.TimeStamp).HasDatabaseName("IX_Logs_TimeStamp");
             });
 
             modelBuilder.Entity<AppUser>(entity =>
             {
-                entity.ToTable("Users");
                 entity.HasKey(b => b.Id);
 
                 entity.Property(b => b.FirstName).HasMaxLength(100).IsRequired();
@@ -85,21 +91,31 @@ namespace Repository.Context
                 entity.HasMany(u => u.Logs).WithOne(l => l.User).HasForeignKey(l => l.UserId);
             });
 
-            modelBuilder.Entity<RolePermission>()
-               .HasKey(rp => new { rp.RoleId, rp.PermissionId });
+            modelBuilder.Entity<RolePermission>(entity =>
+            {
+                entity.ToTable("RolePermissions");
 
-            modelBuilder.Entity<RolePermission>()
-                .HasOne(rp => rp.Role)
-                .WithMany()
-                .HasForeignKey(rp => rp.RoleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasKey(rp => new { rp.RoleId, rp.PermissionId });
+                entity.HasOne(rp => rp.Role).WithMany().HasForeignKey(rp => rp.RoleId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(rp => rp.Permission).WithMany().HasForeignKey(rp => rp.PermissionId).OnDelete(DeleteBehavior.Cascade);
+            });
 
-            modelBuilder.Entity<RolePermission>()
-                .HasOne(rp => rp.Permission)
-                .WithMany()
-                .HasForeignKey(rp => rp.PermissionId)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Permission>(entity =>
+            {
+                entity.ToTable("Permissions");
+                entity.HasKey(s => s.Id);
 
+                entity.Property(b => b.Name).HasMaxLength(100).IsRequired();
+                entity.Property(b => b.Description).HasMaxLength(100).IsRequired();
+
+                entity.HasIndex(p => p.Name).IsUnique();
+
+                entity.HasData(
+                   new Permission { Id = Guid.NewGuid(), Name = "createUser", Description = "Permite crear usuarios" },
+                   new Permission { Id = Guid.NewGuid(), Name = "readUser", Description = "Permite leer usuarios" },
+                   new Permission { Id = Guid.NewGuid(), Name = "disableUsers", Description = "Permite desactivar usuarios" }
+               );
+            });
         }
     }
 }
