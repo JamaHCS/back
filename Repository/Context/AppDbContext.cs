@@ -1,15 +1,16 @@
 ﻿using Domain.Entities.Auth;
 using Domain.Entities.Log;
-using Microsoft.AspNetCore.Identity;
+using Domain.Entities.Roles;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Repository.Context
 {
-    public class AppDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
+    public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     {
-        public DbSet<AppUser> Users { get; set; } = null!;
         public DbSet<LogEvent> LogEvents { get; set; } = null!;
+        public DbSet<Permission> Permissions { get; set; } = default!;
+        public DbSet<RolePermission> RolePermissions { get; set; } = default!;
 
         public AppDbContext()
         {}
@@ -83,6 +84,22 @@ namespace Repository.Context
 
                 entity.HasMany(u => u.Logs).WithOne(l => l.User).HasForeignKey(l => l.UserId);
             });
+
+            modelBuilder.Entity<RolePermission>()
+               .HasKey(rp => new { rp.RoleId, rp.PermissionId });
+
+            modelBuilder.Entity<RolePermission>()
+                .HasOne(rp => rp.Role)
+                .WithMany()
+                .HasForeignKey(rp => rp.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<RolePermission>()
+                .HasOne(rp => rp.Permission)
+                .WithMany()
+                .HasForeignKey(rp => rp.PermissionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

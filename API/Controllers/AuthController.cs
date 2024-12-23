@@ -1,4 +1,5 @@
 ﻿using Domain.DTO.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 
@@ -16,6 +17,7 @@ namespace API.Controllers
         }
 
         [HttpPost("register")]
+        [Authorize(Policy = "createUser")]
         public async Task<IActionResult> Register([FromBody]RegisterDTO request)
         {
             var result = await _authService.Register(request);

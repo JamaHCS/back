@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Domain.common;
-using Domain.Entities.Log;
+﻿using Domain.Entities.Log;
 using Microsoft.AspNetCore.Identity;
 
 

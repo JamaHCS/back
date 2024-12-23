@@ -1,5 +1,8 @@
-﻿using Domain.Entities.Auth;
+﻿using API.Authorization;
+using Domain.Entities.Auth;
+using Domain.Entities.Roles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Repository.Context;
@@ -11,7 +14,7 @@ namespace API.Extensions
     {
         public static void AddAuthenticationConf(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
+            services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
@@ -21,6 +24,28 @@ namespace API.Extensions
             })
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
+
+            services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
+            using (var serviceProvider = services.BuildServiceProvider())
+            {
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                    var allPermissions = context.Permissions.Select(p => p.Name).ToList();
+
+                    services.AddAuthorization(options =>
+                    {
+                        foreach (var permission in allPermissions)
+                        {
+                            options.AddPolicy(permission, policy =>
+                            {
+                                policy.Requirements.Add(new PermissionRequirement(permission));
+                            });
+                        }
+                    });
+                }
+            }
 
             services.AddAuthentication(options =>
             {
