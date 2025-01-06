@@ -64,14 +64,10 @@ try
     builder.Services.addAutoMappers();
     builder.Services.AddConnection(configuration);
     builder.Services.AddAuthenticationConf(configuration);
+    builder.Services.SwaggerConfiguration(configuration);
     builder.Services.registerRepositories();
     builder.Services.registerServices();
-    builder.Services.AddControllers(options =>
-    {
-        options.ModelValidatorProviders.Clear();
-    });
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
     builder.Services.AddFluentValidationAutoValidation();
     builder.Services.AddFluentValidationClientsideAdapters();
     builder.Services.addFluentValidations();

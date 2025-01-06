@@ -15,8 +15,5 @@ namespace Domain.Entities.Roles
         public Guid? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public Guid? UpdatedBy { get; set; }
-        public string? DeletedBy { get; set; }
-        public DateTime? DeletedAt { get; set; }
-        public bool Deleted { get; set; }
     }
 }
