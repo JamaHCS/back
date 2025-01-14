@@ -8,5 +8,7 @@ namespace Repository.Interfaces
     {
         Task<AppUser?> GetByEmailAsync(string email);
         Task<AppUser?> GetByIdAsync(Guid userId);
+        Task UpdateUserAsync(AppUser user);
+        Task UpdateLastLoginAsync(Guid userId);
     }
 }
