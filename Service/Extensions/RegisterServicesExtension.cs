@@ -12,6 +12,8 @@ namespace Service.Extensions
         {
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<IUserService, UserService>();
         }
     }
 }

@@ -23,22 +23,40 @@ namespace API.Authorization
             var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (userIdClaim == null) return;
-            
+
             var userId = Guid.Parse(userIdClaim.Value);
             var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            
+
             if (user == null) return;
 
             var roles = await _userManager.GetRolesAsync(user);
-            var roleIds = await _context.Roles.Where(r => roles.Contains(r.Name)).Select(r => r.Id).ToListAsync();
+            var roleIds = new List<Guid>();
 
-            var hasPermission = await _context.RolePermissions.Include(rp => rp.Permission)
-                .AnyAsync(rp =>
-                    roleIds.Contains(rp.RoleId)
-                    && rp.Permission.Name == requirement.PermissionName
-                );
+            foreach (var roleName in roles)
+            {
+                var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
+                if (role != null)
+                {
+                    roleIds.Add(role.Id);
+                }
+            }
 
-            if (hasPermission) context.Succeed(requirement);
+            var hasPermission = false;
+
+            foreach (var roleId in roleIds)
+            {
+                hasPermission = await _context.RolePermissions
+                    .Include(rp => rp.Permission)
+                    .AnyAsync(rp => rp.RoleId == roleId && rp.Permission.Name == requirement.PermissionName);
+
+                if (hasPermission)
+                    break;
+            }
+
+            if (hasPermission)
+            {
+                context.Succeed(requirement);
+            }
         }
     }
 }

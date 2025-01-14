@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Roles;
+﻿using Domain.DTO.Roles;
+using Domain.Entities.Roles;
 
 namespace Repository.Interfaces
 {

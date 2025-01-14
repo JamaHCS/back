@@ -54,7 +54,7 @@ namespace Service.Implementations
                 _logger.LogInformation("Usuario {UserEmail} loggueado", user.Email);
             }
 
-           return Result.Ok<TokenResponse?>(new TokenResponse { Token = token }, 200);
+           return Result.Ok<TokenResponse?>(new TokenResponse { Token = token, UserId = user.Id }, 200);
         }
 
         public async Task<Result<TokenResponse?>> Register(RegisterDTO request)

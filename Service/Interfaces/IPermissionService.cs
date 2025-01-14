@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Global;
+﻿using Domain.DTO.Users;
+using Domain.Entities.Global;
 using Domain.Entities.Roles;
 
 namespace Service.Interfaces

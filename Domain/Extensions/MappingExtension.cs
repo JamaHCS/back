@@ -9,6 +9,8 @@ namespace Domain.Extensions
         public static void addAutoMappers(this IServiceCollection services)
         {
             services.AddAutoMapper(typeof(RegisterMapping));
+            services.AddAutoMapper(typeof(RolesMapping));
+            services.AddAutoMapper(typeof(UserMapping));
         }
 
     }

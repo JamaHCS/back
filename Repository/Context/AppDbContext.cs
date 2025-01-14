@@ -1,9 +1,11 @@
 ﻿using Domain.Entities.Auth;
 using Domain.Entities.Log;
 using Domain.Entities.Roles;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Repository.Utils;
 
 namespace Repository.Context
 {
@@ -23,7 +25,7 @@ namespace Repository.Context
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-                optionsBuilder.UseSqlServer("Server=contafacil.tech\\MSSQLSERVER2012;Database=pim;Uid=pim;Pwd=r45l7fB_1;Trust Server Certificate=true");
+                optionsBuilder.UseSqlServer("Server=contafacil.tech\\MSSQLSERVER2012;Database=pim;Uid=pim;Pwd=r45l7fB_1;Trust Server Certificate=true;");
 
             optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
 
@@ -34,6 +36,58 @@ namespace Repository.Context
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.HasDefaultSchema("pim");
+
+
+            var jamaUser = new AppUser
+            {
+                Email = "jama@pim.com",
+                UserName = "jama@pim.com"
+            };
+
+            string hash = Utils.Utils.GetHashPassword(jamaUser, "acceso.pim");
+
+            jamaUser = new AppUser
+            {
+                Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                UserName = jamaUser.UserName,
+                NormalizedUserName = "JAMA@PIM.COM",
+                PhoneNumber = "4424051649",
+                Email = jamaUser.Email,
+                NormalizedEmail = "JAMA@PIM.COM",
+                EmailConfirmed = true,
+                PasswordHash = hash,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                FirstName = "Jama",
+                MiddleName = "Sr",
+                LastName = "Developer",
+                MotherLastName = "",
+                CreatedAt = DateTime.UtcNow,
+                DateOfBirth = new DateTime(2000, 3, 20, 0, 0, 0, DateTimeKind.Utc)
+            };
+
+            var permissions = new List<Permission>
+            {
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0001-000000000000"), Name = "createUser", Description = "Permite crear usuarios" },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0002-000000000000"), Name = "readUser", Description = "Permite leer usuarios" },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0003-000000000000"), Name = "disableUsers", Description = "Permite desactivar usuarios" },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0004-000000000000"), Name = "readPermissions", Description = "Permite leer los permisos existentes" },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0005-000000000000"), Name = "readUserById", Description = "Permite leer la información detallada del usuario" }
+            };
+
+            var superUserRole = new AppRole
+            {
+                Id = Guid.Parse("00000000-0000-0000-1000-000000000000"),
+                Name = "SuperUser",
+                NormalizedName = "SUPERUSER",
+                Description = "Rol con acceso total a todas las funcionalidades",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var rolePermissionsSuperUser = permissions.Select(permissions => new RolePermission
+            {
+                RoleId = superUserRole.Id,
+                PermissionId = permissions.Id
+            }).ToList();
 
             modelBuilder.Entity<LogSubject>(entity =>
             {
@@ -80,6 +134,7 @@ namespace Repository.Context
 
             modelBuilder.Entity<AppUser>(entity =>
             {
+                entity.ToTable("Users");
                 entity.HasKey(b => b.Id);
 
                 entity.Property(b => b.FirstName).HasMaxLength(100).IsRequired();
@@ -89,15 +144,44 @@ namespace Repository.Context
                 entity.Property(b => b.DateOfBirth).IsRequired();
 
                 entity.HasMany(u => u.Logs).WithOne(l => l.User).HasForeignKey(l => l.UserId);
+
+                entity.HasData(jamaUser);
             });
 
-            modelBuilder.Entity<RolePermission>(entity =>
+            modelBuilder.Entity<AppRole>(entity =>
             {
-                entity.ToTable("RolePermissions");
+                entity.ToTable("Roles");
+                entity.HasData(superUserRole);
+            });
 
-                entity.HasKey(rp => new { rp.RoleId, rp.PermissionId });
-                entity.HasOne(rp => rp.Role).WithMany().HasForeignKey(rp => rp.RoleId).OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(rp => rp.Permission).WithMany().HasForeignKey(rp => rp.PermissionId).OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<IdentityUserRole<Guid>>(entity =>
+            {
+                entity.ToTable("UserRoles");
+                entity.HasData(new IdentityUserRole<Guid>
+                {
+                    UserId = jamaUser.Id,
+                    RoleId = superUserRole.Id
+                });
+            });
+
+            modelBuilder.Entity<IdentityRoleClaim<Guid>>(entity =>
+            {
+                entity.ToTable("RoleClaims");
+            });
+
+            modelBuilder.Entity<IdentityUserClaim<Guid>>(entity =>
+            {
+                entity.ToTable("UserClaims");
+            });
+
+            modelBuilder.Entity<IdentityUserLogin<Guid>>(entity =>
+            {
+                entity.ToTable("UserLogins");
+            });
+
+            modelBuilder.Entity<IdentityUserToken<Guid>>(entity =>
+            {
+                entity.ToTable("UserTokens");
             });
 
             modelBuilder.Entity<Permission>(entity =>
@@ -110,11 +194,18 @@ namespace Repository.Context
 
                 entity.HasIndex(p => p.Name).IsUnique();
 
-                entity.HasData(
-                   new Permission { Id = Guid.NewGuid(), Name = "createUser", Description = "Permite crear usuarios" },
-                   new Permission { Id = Guid.NewGuid(), Name = "readUser", Description = "Permite leer usuarios" },
-                   new Permission { Id = Guid.NewGuid(), Name = "disableUsers", Description = "Permite desactivar usuarios" }
-               );
+                entity.HasData(permissions);
+            });
+
+            modelBuilder.Entity<RolePermission>(entity =>
+            {
+                entity.ToTable("RolePermissions");
+
+                entity.HasKey(rp => new { rp.RoleId, rp.PermissionId });
+                entity.HasOne(rp => rp.Role).WithMany().HasForeignKey(rp => rp.RoleId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(rp => rp.Permission).WithMany().HasForeignKey(rp => rp.PermissionId).OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasData(rolePermissionsSuperUser);
             });
         }
     }

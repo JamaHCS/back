@@ -12,8 +12,8 @@ using Repository.Context;
 namespace Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241223201943_initMigrations")]
-    partial class initMigrations
+    [Migration("20250113232020_UserJamaModifications")]
+    partial class UserJamaModifications
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -135,7 +135,32 @@ namespace Repository.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", "pim");
+                    b.ToTable("Users", "pim");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "681e29fd-a071-4557-8e85-85468e5645e1",
+                            CreatedAt = new DateTime(2025, 1, 13, 23, 20, 19, 472, DateTimeKind.Utc).AddTicks(5213),
+                            DateOfBirth = new DateTime(2000, 3, 20, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Deleted = false,
+                            Email = "jama@pim.com",
+                            EmailConfirmed = true,
+                            FirstName = "Jama",
+                            LastName = "Developer",
+                            LockoutEnabled = false,
+                            MiddleName = "Sr",
+                            MotherLastName = "",
+                            NormalizedEmail = "JAMA@PIM.COM",
+                            NormalizedUserName = "JAMA@PIM.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEF5lJyYrfe77qLeeN4v4JCSL6W6iKuFXqJpNEy3QEfKIDnsS8KR6bAUZPG82PYu1cA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "50e4fabc-d221-494a-970e-6b3eb67855ec",
+                            TwoFactorEnabled = false,
+                            UserName = "jama@pim.com"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Log.LogEvent", b =>
@@ -214,9 +239,14 @@ namespace Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LogSubjectId");
+                    b.HasIndex("LogSubjectId")
+                        .HasDatabaseName("IX_Logs_LogSubjectId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("TimeStamp")
+                        .HasDatabaseName("IX_Logs_TimeStamp");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_Logs_UserId");
 
                     b.ToTable("Logs", "pim");
                 });
@@ -266,15 +296,6 @@ namespace Repository.Migrations
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -300,7 +321,17 @@ namespace Repository.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles", "pim");
+                    b.ToTable("Roles", "pim");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-1000-000000000000"),
+                            CreatedAt = new DateTime(2025, 1, 13, 23, 20, 19, 472, DateTimeKind.Utc).AddTicks(8865),
+                            Description = "Rol con acceso total a todas las funcionalidades",
+                            Name = "SuperUser",
+                            NormalizedName = "SUPERUSER"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Roles.Permission", b =>
@@ -321,26 +352,41 @@ namespace Repository.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Permissions", "pim");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("624399ff-f1d1-4474-8ee1-32c8763f0ebb"),
+                            Id = new Guid("00000000-0000-0000-0001-000000000000"),
                             Description = "Permite crear usuarios",
                             Name = "createUser"
                         },
                         new
                         {
-                            Id = new Guid("8eac95b4-3eac-42fe-8191-73a49237f58c"),
+                            Id = new Guid("00000000-0000-0000-0002-000000000000"),
                             Description = "Permite leer usuarios",
                             Name = "readUser"
                         },
                         new
                         {
-                            Id = new Guid("b6bf075f-4dc9-467f-a0e7-eba18f4aeb9c"),
+                            Id = new Guid("00000000-0000-0000-0003-000000000000"),
                             Description = "Permite desactivar usuarios",
                             Name = "disableUsers"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0004-000000000000"),
+                            Description = "Permite leer los permisos existentes",
+                            Name = "readPermissions"
+                        },
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0005-000000000000"),
+                            Description = "Permite leer la información detallada del usuario",
+                            Name = "readUserById"
                         });
                 });
 
@@ -352,11 +398,43 @@ namespace Repository.Migrations
                     b.Property<Guid>("PermissionId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("AppRoleId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("RoleId", "PermissionId");
+
+                    b.HasIndex("AppRoleId");
 
                     b.HasIndex("PermissionId");
 
                     b.ToTable("RolePermissions", "pim");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            PermissionId = new Guid("00000000-0000-0000-0001-000000000000")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            PermissionId = new Guid("00000000-0000-0000-0002-000000000000")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            PermissionId = new Guid("00000000-0000-0000-0003-000000000000")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            PermissionId = new Guid("00000000-0000-0000-0004-000000000000")
+                        },
+                        new
+                        {
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            PermissionId = new Guid("00000000-0000-0000-0005-000000000000")
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -380,7 +458,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", "pim");
+                    b.ToTable("RoleClaims", "pim");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -404,7 +482,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", "pim");
+                    b.ToTable("UserClaims", "pim");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
@@ -425,7 +503,7 @@ namespace Repository.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", "pim");
+                    b.ToTable("UserLogins", "pim");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
@@ -440,7 +518,14 @@ namespace Repository.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", "pim");
+                    b.ToTable("UserRoles", "pim");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("00000000-0000-0000-0000-000000000001"),
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000")
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -459,7 +544,7 @@ namespace Repository.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", "pim");
+                    b.ToTable("UserTokens", "pim");
                 });
 
             modelBuilder.Entity("Domain.Entities.Log.LogEvent", b =>
@@ -479,6 +564,10 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Domain.Entities.Roles.RolePermission", b =>
                 {
+                    b.HasOne("Domain.Entities.Roles.AppRole", null)
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("AppRoleId");
+
                     b.HasOne("Domain.Entities.Roles.Permission", "Permission")
                         .WithMany()
                         .HasForeignKey("PermissionId")
@@ -555,6 +644,11 @@ namespace Repository.Migrations
             modelBuilder.Entity("Domain.Entities.Log.LogSubject", b =>
                 {
                     b.Navigation("LogEvents");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Roles.AppRole", b =>
+                {
+                    b.Navigation("RolePermissions");
                 });
 #pragma warning restore 612, 618
         }

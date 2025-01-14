@@ -1,5 +1,8 @@
-﻿using Domain.Entities.Global;
+﻿using Domain.DTO.Users;
+using Domain.Entities.Auth;
+using Domain.Entities.Global;
 using Domain.Entities.Roles;
+using Microsoft.AspNetCore.Identity;
 using Repository.Interfaces;
 using Service.Interfaces;
 
