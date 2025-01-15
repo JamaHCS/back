@@ -23,6 +23,7 @@ namespace Domain.Entities.Log
                 };
 
             var dictionary = new Dictionary<string, object?>();
+
             foreach (var property in context.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
                 dictionary[property.Name] = property.GetValue(context);

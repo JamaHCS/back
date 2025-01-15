@@ -1,7 +1,4 @@
-﻿using Azure.Core;
-using System.Reflection;
-using Domain.Entities.Log;
-using NuGet.Protocol.Core.Types;
+﻿using Domain.Entities.Log;
 
 namespace API.Middlewares
 {

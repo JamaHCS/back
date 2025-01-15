@@ -35,10 +35,9 @@ namespace API.Authorization
             foreach (var roleName in roles)
             {
                 var role = await _context.Roles.FirstOrDefaultAsync(r => r.Name == roleName);
-                if (role != null)
-                {
-                    roleIds.Add(role.Id);
-                }
+                
+                if (role != null) roleIds.Add(role.Id);
+                
             }
 
             var hasPermission = false;
@@ -49,14 +48,10 @@ namespace API.Authorization
                     .Include(rp => rp.Permission)
                     .AnyAsync(rp => rp.RoleId == roleId && rp.Permission.Name == requirement.PermissionName);
 
-                if (hasPermission)
-                    break;
+                if (hasPermission) break;
             }
 
-            if (hasPermission)
-            {
-                context.Succeed(requirement);
-            }
+            if (hasPermission) context.Succeed(requirement);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Domain.Entities.Auth;
+﻿using Domain.Entities.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Repository.Context;
@@ -12,23 +11,14 @@ namespace Repository.Implementations
         private readonly UserManager<AppUser> _userManager;
         private readonly AppDbContext _context;
 
-
         public UserRepository(UserManager<AppUser> userManager, AppDbContext context)
         {
             _userManager = userManager;
             _context = context;
         }
 
-        public async Task<AppUser?> GetByEmailAsync(string email)
-        {
-            return await _userManager.FindByEmailAsync(email);
-        }
-
-        public async Task<AppUser?> GetByIdAsync(Guid userId)
-        {
-            return await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        }
-
+        public async Task<AppUser?> GetByEmailAsync(string email) => await _userManager.FindByEmailAsync(email);
+        public async Task<AppUser?> GetByIdAsync(Guid userId) => await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
         public async Task UpdateUserAsync(AppUser user)
         {
             _context.Users.Update(user);

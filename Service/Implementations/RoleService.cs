@@ -23,24 +23,17 @@ namespace Service.Implementations
         public async Task<Result<List<RoleWithPermissions>>> GetRolesAndPermissions(Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null)
-            {
-                return Result.Failure("Usuario no encontrado.", new List<RoleWithPermissions> {}, 404);
-            }
+
+            if (user == null) return Result.Failure("Usuario no encontrado.", new List<RoleWithPermissions> {}, 404);
 
             var rolesWithPermissions = await _roleRepository.GetRolesAndPermissionsByUserIdAsync(userId);
 
             return Result.Ok(rolesWithPermissions, 200);
         }
 
-        public async Task AssignRoleToUser(AppUser user, string roleName)
-        {
-            var result = await _userManager.AddToRoleAsync(user, roleName);
-        }
-
-        public async Task RemoveRoleFromUser(AppUser user, string roleName)
-        {
-            var result = await _userManager.RemoveFromRoleAsync(user, roleName);
-        }
+        public async Task AssignRoleToUser(AppUser user, string roleName) => await _userManager.AddToRoleAsync(user, roleName);
+        
+        public async Task RemoveRoleFromUser(AppUser user, string roleName) => await _userManager.RemoveFromRoleAsync(user, roleName);
+        
     }
 }

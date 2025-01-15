@@ -31,10 +31,7 @@ namespace Service.Implementations
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
 
-            if(user is null)
-            {
-                using (_logger.BeginScope(LogContextManager.ToDictionary())) _logger.LogInformation("Usuario {UserEmail} no fue encontrado", request.Email);
-            }
+            if(user is null) using (_logger.BeginScope(LogContextManager.ToDictionary())) _logger.LogInformation("Usuario {UserEmail} no fue encontrado", request.Email);
 
             if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
             {
