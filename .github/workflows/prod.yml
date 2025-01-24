@@ -43,5 +43,5 @@ jobs:
         server: 209.46.124.109
         username: ${{ secrets.FTP_USER_DEV }}
         password: ${{ secrets.FTP_PASSWORD_DEV }}
-        local-dir: ./publish
+        local-dir: ./publish/
         dangerous-clean-slate: true
