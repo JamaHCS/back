@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35514.174 d17.12
+VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{336700C4-8EC9-4663-B2C3-DB20FC418B07}"
 EndProject
@@ -10,6 +10,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{CD0FB522-2077-4215-AB05-8D452456C5EA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{E27A368B-D075-49C0-8F86-B50475987E78}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{B0EBAC2F-58AF-4A61-929B-C7D7AF0A6E92}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{B12B1B32-297B-4DC5-97D0-6DFEDD429A5E}"
+	ProjectSection(SolutionItems) = preProject
+		dev.yml = dev.yml
+		prod.yml = prod.yml
+		qa.yml = qa.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +45,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B12B1B32-297B-4DC5-97D0-6DFEDD429A5E} = {B0EBAC2F-58AF-4A61-929B-C7D7AF0A6E92}
 	EndGlobalSection
 EndGlobal
