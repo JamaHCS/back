@@ -37,6 +37,11 @@ jobs:
     - name: Publish API
       run: dotnet publish ./API/API.csproj --configuration Release --output ./publish
 
+    - name: Modify web.config with secrets
+      run: |
+        echo "Updating web.config with secrets..."
+        sed -i 's|<environmentVariables>|<environmentVariables>\n<environmentVariable name="ASPNETCORE_ENVIRONMENT" value="Production" />\n<environmentVariable name="CONNECTION_STRING" value="${{ secrets.CONNECTION_STRING_DEV }}" />|' ./publish/web.config
+
     - name: FTP Deploy
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
