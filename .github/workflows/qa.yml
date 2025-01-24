@@ -26,7 +26,7 @@ jobs:
     - name: Apply Database Migrations
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING_DEV }}
-      run: dotnet ef database update --no-build
+      run: dotnet ef database update --no-build --project ./Repository/Repository.csproj
 
     - name: Build API
       run: dotnet build --configuration Release
