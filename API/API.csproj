@@ -6,6 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+	<Target Name="UpdateWebConfig" AfterTargets="Publish">
+		<XmlPoke XmlInputPath="$(PublishDir)web.config"
+				 Query="//aspNetCore/@stdoutLogEnabled"
+				 Value="true" />
+	</Target>
+
   <ItemGroup>
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
