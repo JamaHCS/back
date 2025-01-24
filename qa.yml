@@ -1,0 +1,41 @@
+name: Qa CI/CD
+
+on:
+  push:
+    branches: [ qa ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build API
+      run: dotnet build --configuration Release
+
+    - name: Apply Database Migrations
+      env:
+        CONNECTION_STRING: ${{ secrets.CONNECTION_STRING_DEV }}
+      run: dotnet ef database update --no-build
+
+    - name: Publish API
+      run: dotnet publish --configuration Release --output ./publish
+
+    - name: FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      with:
+        server: 209.46.124.109
+        username: ${{ secrets.FTP_USER_DEV }}
+        password: ${{ secrets.FTP_PASSWORD_DEV }}
+        local-dir: ./publish
+        dangerous-clean-slate: true
