@@ -44,7 +44,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug)
     .WriteTo.MSSqlServer(
-        connectionString: builder.Configuration.GetConnectionString("ContafacilServerConnection"),
+        connectionString: Environment.GetEnvironmentVariable("CONNECTION_STRING"),
         sinkOptions: new MSSqlServerSinkOptions
         {
             TableName = "Logs",

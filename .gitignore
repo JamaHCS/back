@@ -84,3 +84,5 @@ Coverage/
 *.ldf
 
 # ========== End of .gitignore ==========
+
+publish/

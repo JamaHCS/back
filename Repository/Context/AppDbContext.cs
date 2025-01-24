@@ -18,25 +18,17 @@ namespace Repository.Context
 
         public AppDbContext()
         {}
-
+        
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {}
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-                optionsBuilder.UseSqlServer("Server=contafacil.tech\\MSSQLSERVER2012;Database=pim;Uid=pim;Pwd=r45l7fB_1;Trust Server Certificate=true;");
-
-            optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
-
-        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.HasDefaultSchema("pim");
-
 
             var jamaUser = new AppUser
             {
@@ -71,7 +63,8 @@ namespace Repository.Context
                 new Permission { Id = Guid.Parse("00000000-0000-0000-0002-000000000000"), Name = "readUser", Description = "Permite leer usuarios" },
                 new Permission { Id = Guid.Parse("00000000-0000-0000-0003-000000000000"), Name = "disableUsers", Description = "Permite desactivar usuarios" },
                 new Permission { Id = Guid.Parse("00000000-0000-0000-0004-000000000000"), Name = "readPermissions", Description = "Permite leer los permisos existentes" },
-                new Permission { Id = Guid.Parse("00000000-0000-0000-0005-000000000000"), Name = "readUserById", Description = "Permite leer la información detallada del usuario" }
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0005-000000000000"), Name = "readUserById", Description = "Permite leer la información detallada del usuario" },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0006-000000000000"), Name = "getRolesByUser", Description = "Permite leer los roles y permisos por usuario." }
             };
 
             var superUserRole = new AppRole
