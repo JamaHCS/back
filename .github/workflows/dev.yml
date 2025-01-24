@@ -24,7 +24,7 @@ jobs:
       run: dotnet tool install --global dotnet-ef
 
     - name: Build Repository Project
-      run: dotnet build --configuration Release --project ./Repository/Repository.csproj
+      run: dotnet build ./Repository/Repository.csproj --configuration Release
 
     - name: Apply Database Migrations
       env:
@@ -32,10 +32,17 @@ jobs:
       run: dotnet ef database update --project ./Repository/Repository.csproj
 
     - name: Build API
-      run: dotnet build --configuration Release
+      run: dotnet build ./API/API.csproj --configuration Release
 
     - name: Publish API
-      run: dotnet publish --configuration Release --output ./publish
+      run: dotnet publish ./API/API.csproj --configuration Release --output ./publish
+
+    - name: Modify web.config with secrets
+      env:
+        CONNECTION_STRING_DEV: ${{ secrets.CONNECTION_STRING_DEV }}
+      run: |
+        echo "Updating web.config with secrets..."
+        sed -i "s|<environmentVariables>|<environmentVariables>\n<environmentVariable name=\"ASPNETCORE_ENVIRONMENT\" value=\"Production\" />\n<environmentVariable name=\"CONNECTION_STRING\" value=\"$CONNECTION_STRING_DEV\" />|" ./publish/web.config
 
     - name: FTP Deploy
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
@@ -43,5 +50,5 @@ jobs:
         server: 209.46.124.109
         username: ${{ secrets.FTP_USER_DEV }}
         password: ${{ secrets.FTP_PASSWORD_DEV }}
-        local-dir: ./publish
+        local-dir: ./publish/
         dangerous-clean-slate: true
