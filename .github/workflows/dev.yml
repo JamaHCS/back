@@ -23,10 +23,13 @@ jobs:
     - name: Install EF Tools
       run: dotnet tool install --global dotnet-ef
 
+    - name: Build Repository Project
+      run: dotnet build --configuration Release --project ./Repository/Repository.csproj
+
     - name: Apply Database Migrations
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING_DEV }}
-      run: dotnet ef database update --no-build --project ./Repository/Repository.csproj
+      run: dotnet ef database update --project ./Repository/Repository.csproj
 
     - name: Build API
       run: dotnet build --configuration Release
@@ -41,4 +44,4 @@ jobs:
         username: ${{ secrets.FTP_USER_DEV }}
         password: ${{ secrets.FTP_PASSWORD_DEV }}
         local-dir: ./publish
-        dangerous-clean-slate: true 
+        dangerous-clean-slate: true
