@@ -32,10 +32,10 @@ jobs:
       run: dotnet ef database update --project ./Repository/Repository.csproj
 
     - name: Build API
-      run: dotnet build ./Api/Api.csproj --configuration Release
+      run: dotnet build ./API/API.csproj --configuration Release
 
     - name: Publish API
-      run: dotnet publish ./Api/Api.csproj --configuration Release --output ./publish
+      run: dotnet publish ./API/API.csproj --configuration Release --output ./publish
 
     - name: FTP Deploy
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
