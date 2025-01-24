@@ -41,4 +41,4 @@ jobs:
         username: ${{ secrets.FTP_USER_DEV }}
         password: ${{ secrets.FTP_PASSWORD_DEV }}
         local-dir: ./publish
-        dangerous-clean-slate: truetrue
+        dangerous-clean-slate: true
