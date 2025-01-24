@@ -24,7 +24,7 @@ jobs:
       run: dotnet tool install --global dotnet-ef
 
     - name: Build Repository Project
-      run: dotnet build --configuration Release --project ./Repository/Repository.csproj
+      run: dotnet build ./Repository/Repository.csproj --configuration Release
 
     - name: Apply Database Migrations
       env:
@@ -32,10 +32,10 @@ jobs:
       run: dotnet ef database update --project ./Repository/Repository.csproj
 
     - name: Build API
-      run: dotnet build --configuration Release
+      run: dotnet build ./Api/Api.csproj --configuration Release
 
     - name: Publish API
-      run: dotnet publish --configuration Release --output ./publish
+      run: dotnet publish ./Api/Api.csproj --configuration Release --output ./publish
 
     - name: FTP Deploy
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
