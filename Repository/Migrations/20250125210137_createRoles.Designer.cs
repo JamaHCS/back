@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.Context;
 
@@ -11,9 +12,11 @@ using Repository.Context;
 namespace Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250125210137_createRoles")]
+    partial class createRoles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,8 +142,8 @@ namespace Repository.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9b427950-af78-4904-ace2-dec65d891aad",
-                            CreatedAt = new DateTime(2025, 1, 25, 22, 15, 57, 981, DateTimeKind.Utc).AddTicks(9083),
+                            ConcurrencyStamp = "86f2b828-f799-4aef-8e94-8f7150ab837c",
+                            CreatedAt = new DateTime(2025, 1, 25, 21, 1, 35, 928, DateTimeKind.Utc).AddTicks(3275),
                             DateOfBirth = new DateTime(2000, 3, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Deleted = false,
                             Email = "jama@pim.com",
@@ -152,10 +155,10 @@ namespace Repository.Migrations
                             MotherLastName = "",
                             NormalizedEmail = "JAMA@PIM.COM",
                             NormalizedUserName = "JAMA@PIM.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMJhvEG+T3ngEdydu6yKNELrzJw0q4QhkPZTUAtRTN9CF/tpcCiIeK/QVEU4ZZ99qg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDyaCJisUHvlRY8J9eWt5IUpa5JLRqAnFE6ccXvrzMymAqK1+mHhsXW2czA0JdOFWA==",
                             PhoneNumber = "4424051649",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3d4a66b5-3f04-4ef1-8861-dde0f044ce27",
+                            SecurityStamp = "eaa12a0c-fcb7-4143-8e94-3c5ee8e7b533",
                             TwoFactorEnabled = false,
                             UserName = "jama@pim.com"
                         });
@@ -325,7 +328,7 @@ namespace Repository.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-1000-000000000000"),
-                            CreatedAt = new DateTime(2025, 1, 25, 22, 15, 57, 982, DateTimeKind.Utc).AddTicks(3380),
+                            CreatedAt = new DateTime(2025, 1, 25, 21, 1, 35, 928, DateTimeKind.Utc).AddTicks(7354),
                             Description = "Rol con acceso total a todas las funcionalidades",
                             Name = "SuperUser",
                             NormalizedName = "SUPERUSER"
@@ -391,12 +394,6 @@ namespace Repository.Migrations
                             Id = new Guid("00000000-0000-0000-0008-000000000000"),
                             Description = "Permite modificar los roles.",
                             Name = "putRoles"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0009-000000000000"),
-                            Description = "Permite eliminar los roles.",
-                            Name = "deleteRoles"
                         });
                 });
 
@@ -449,11 +446,6 @@ namespace Repository.Migrations
                         {
                             RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0008-000000000000")
-                        },
-                        new
-                        {
-                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
-                            PermissionId = new Guid("00000000-0000-0000-0009-000000000000")
                         });
                 });
 

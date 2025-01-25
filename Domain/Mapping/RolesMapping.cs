@@ -13,7 +13,7 @@ namespace Domain.Mapping
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.RolePermissions));
 
-            CreateMap<RolePermission, PermissionDto>()
+            CreateMap<RolePermission, PermissionDTO>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Permission.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Permission.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Permission.Description));

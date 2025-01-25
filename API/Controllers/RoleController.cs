@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Domain.DTO.Roles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 
@@ -33,11 +34,29 @@ namespace API.Controllers
             return StatusCode(result.Status, result);
         }
 
+        [HttpPost("")]
+        [Authorize(Policy = "postRoles")]
+        public async Task<IActionResult> CreateRole(CreateRoleDTO role)
+        {
+            var result = await _roleService.CreateRoleAsync(role);
+
+            return StatusCode(result.Status, result);
+        }
+
         [HttpPut("{roleId}/permissions")]
         [Authorize(Policy = "putRoles")]
-        public async Task<IActionResult> UpdateRolePermissions(Guid roleId, [FromBody] IEnumerable<Guid> permissionIds)
+        public async Task<IActionResult> UpdateRolePermissions(Guid roleId, [FromBody] UpdatePermissionsOnRoleDTO permissionIds)
         {
-            var result = await _roleService.UpdateRolePermissionsAsync(roleId, permissionIds);
+            var result = await _roleService.UpdateRolePermissionsAsync(roleId, permissionIds.Permissions);
+
+            return StatusCode(result.Status, result);
+        }
+
+        [HttpDelete("{roleId}")]
+        [Authorize(Policy = "deleteRoles")]
+        public async Task<IActionResult> DeleteRole(Guid roleId)
+        {
+            var result = await _roleService.DeleteRoleAsync(roleId);
 
             return StatusCode(result.Status, result);
         }

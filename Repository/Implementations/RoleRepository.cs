@@ -8,6 +8,7 @@ using Domain.Entities.Auth;
 using Microsoft.AspNetCore.Identity;
 using AutoMapper.QueryableExtensions;
 using Domain.DTO.Roles;
+using Domain.Entities.Global;
 
 namespace Repository.Implementations
 {
@@ -71,6 +72,42 @@ namespace Repository.Implementations
                     .ThenInclude(rp => rp.Permission)
                 .ProjectTo<RoleWithPermissions>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
+        public async Task<RoleWithPermissions?> CreateRoleWithPermissionsAsync(AppRole role, IEnumerable<Guid> permissionIds)
+        {
+            await _context.Roles.AddAsync(role);
 
+            if (permissionIds.Any())
+            {
+                var rolePermissions = permissionIds.Select(permissionId => new RolePermission
+                {
+                    RoleId = role.Id,
+                    PermissionId = permissionId
+                });
+
+                await _context.RolePermissions.AddRangeAsync(rolePermissions);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return await GetRoleWithPermissionsByIdAsync(role.Id);
+        }
+
+        public async Task<Result> DeleteRoleAsync(Guid roleId)
+        {
+            var role = await _context.Roles.Include(r => r.RolePermissions).FirstOrDefaultAsync(r => r.Id == roleId);
+
+            if (role is null) return Result.Failure("Role not found.", 404);
+            
+            _context.RolePermissions.RemoveRange(role.RolePermissions);
+
+            var userRoles = await _context.UserRoles.Where(ur => ur.RoleId == roleId).ToListAsync();
+
+            _context.UserRoles.RemoveRange(userRoles);
+            _context.Roles.Remove(role);
+
+            await _context.SaveChangesAsync();
+
+            return Result.Ok(204);            
+        }
     }
 }
