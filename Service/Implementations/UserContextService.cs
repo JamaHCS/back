@@ -22,7 +22,11 @@ namespace Service.Implementations
             var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("sub") ??
                               _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
 
-            if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId)) return await _userRepository.GetByIdAsync(userId);
+            if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                var user = await _userRepository.GetByIdAsync(userId);
+                return user.Value;
+            }
             else return null;
         }
     }

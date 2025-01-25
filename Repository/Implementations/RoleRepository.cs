@@ -37,9 +37,9 @@ public class RoleRepository : IRoleRepository
     {
         var user = await _userRepository.GetByIdAsync(userId);
 
-        if (user is null) return Result.Failure<List<RoleWithPermissions>>("Usuario no encontrado.", 404);
+        if (!user.Success) return Result.Failure<List<RoleWithPermissions>>("Usuario no encontrado.", 404);
 
-        var roles = await _userManager.GetRolesAsync(user);
+        var roles = await _userManager.GetRolesAsync(user.Value);
 
         var rolesWithPermissions = await _context.Roles
             .Where(r => roles.Contains(r.Name))
