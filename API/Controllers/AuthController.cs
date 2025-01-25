@@ -17,7 +17,7 @@ namespace API.Controllers
         }
 
         [HttpPost("register")]
-        [Authorize(Policy = "createUser")]
+        [Authorize(Policy = "postUser")]
         public async Task<IActionResult> Register([FromBody]RegisterDTO request)
         {
             var result = await _authService.Register(request);

@@ -14,8 +14,6 @@ namespace Repository.Implementations
             _context = context;
         }
 
-        public async Task<Permission?> GetByIdAsync(Guid id) => await _context.Permissions.FindAsync(id);
         public async Task<IEnumerable<Permission>> GetAllAsync() => await _context.Permissions.ToListAsync();
-        
     }
 }

@@ -1,9 +1,5 @@
 ﻿using Domain.DTO.Roles;
-using Domain.Entities.Auth;
 using Domain.Entities.Global;
-using Domain.Entities.Log;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 using Repository.Interfaces;
 using Service.Interfaces;
 
@@ -13,15 +9,11 @@ namespace Service.Implementations
     {
         private readonly IRoleRepository _roleRepository;
         private readonly IUserRepository _userRepository;
-        private readonly UserManager<AppUser> _userManager;
-        private readonly ILogger<RoleService> _logger;
 
-        public RoleService(IRoleRepository roleRepository, IUserRepository userRepository, UserManager<AppUser> userManager, ILogger<RoleService> logger)
+        public RoleService(IRoleRepository roleRepository, IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _userManager = userManager;
             _roleRepository = roleRepository;
-            _logger = logger;
         }
 
         public async Task<Result<List<RoleWithPermissions>>> GetRolesAndPermissions(Guid userId)
@@ -32,14 +24,32 @@ namespace Service.Implementations
 
             var rolesWithPermissions = await _roleRepository.GetRolesAndPermissionsByUserIdAsync(userId);
 
-            using (_logger.BeginScope(LogContextManager.ToDictionary(user.Id))) _logger.LogInformation("Permisos de usuario consultados.");
-
             return Result.Ok(rolesWithPermissions, 200);
         }
 
-        public async Task AssignRoleToUser(AppUser user, string roleName) => await _userManager.AddToRoleAsync(user, roleName);
-        
-        public async Task RemoveRoleFromUser(AppUser user, string roleName) => await _userManager.RemoveFromRoleAsync(user, roleName);
-        
+        public async Task<Result<List<PermissionDto>>> UpdateRolePermissionsAsync(Guid roleId, IEnumerable<Guid> permissionIds)
+        {
+            var role = await _roleRepository.GetByIdAsync(roleId);
+
+            if (role is null) return Result.Failure<List<PermissionDto>>("Rol no encontrado.", 404);
+
+            var permissions = await _roleRepository.UpdateRolePermissionsAsync(roleId, permissionIds);
+
+            return Result.Ok(permissions.Select(permission => new PermissionDto
+            {
+                Id = permission.Id,
+                Name = permission.Name,
+                Description = permission.Description
+            }).ToList(), 200);
+        }
+
+        public async Task<Result<RoleWithPermissions?>> GetRoleAndPermissionsById(Guid roleId)
+        {
+            var role = await _roleRepository.GetRoleWithPermissionsByIdAsync(roleId);
+
+            if (role is null) return Result.Failure<RoleWithPermissions?>("Rol no encontrado.", 404);
+
+            return Result.Ok<RoleWithPermissions?>(role, 200);
+        }
     }
 }

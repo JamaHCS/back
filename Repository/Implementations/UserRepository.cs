@@ -17,7 +17,6 @@ namespace Repository.Implementations
             _context = context;
         }
 
-        public async Task<AppUser?> GetByEmailAsync(string email) => await _userManager.FindByEmailAsync(email);
         public async Task<AppUser?> GetByIdAsync(Guid userId) => await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
         public async Task UpdateUserAsync(AppUser user)
         {

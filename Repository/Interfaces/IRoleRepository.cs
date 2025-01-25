@@ -5,12 +5,10 @@ namespace Repository.Interfaces
 {
     public interface IRoleRepository
     {
-        public Task<List<RolePermission>> AssignPermissionToRole(Guid roleId, Guid permissionId);
-        public Task<List<RolePermission>> RemovePermissionFromRole(Guid roleId, Guid permissionId);
-        public Task<List<RolePermission>> AssignPermissionsToRole(Guid roleId, IEnumerable<Guid> permissionIds);
-        public Task<List<RolePermission>> RemovePermissionsFromRole(Guid roleId, IEnumerable<Guid> permissionIds);
-        public Task<List<RolePermission>> GetPermissions(Guid roleId);
-        Task<List<RoleWithPermissions>> GetRolesAndPermissionsByUserIdAsync(Guid userId);
-
+        public Task<List<Permission>> GetPermissionsByRoleAsync(Guid roleId);
+        public Task<List<RoleWithPermissions>> GetRolesAndPermissionsByUserIdAsync(Guid userId);
+        public Task<AppRole?> GetByIdAsync(Guid roleId);
+        public Task<List<Permission>> UpdateRolePermissionsAsync(Guid roleId, IEnumerable<Guid> permissionIds);
+        public Task<RoleWithPermissions?> GetRoleWithPermissionsByIdAsync(Guid roleId);
     }
 }

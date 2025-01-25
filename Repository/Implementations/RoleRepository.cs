@@ -26,81 +26,7 @@ namespace Repository.Implementations
             _userRepository = userRepository;
         }
 
-        public async Task<List<RolePermission>> AssignPermissionToRole(Guid roleId, Guid permissionId)
-        {
-            var existing = await _context.RolePermissions.FirstOrDefaultAsync(rp => rp.RoleId == roleId && rp.PermissionId == permissionId);
-
-            if (existing == null)
-            {
-                var rp = new RolePermission
-                {
-                    RoleId = roleId,
-                    PermissionId = permissionId
-                };
-
-                _context.RolePermissions.Add(rp);
-
-                await _context.SaveChangesAsync();
-            }
-
-            return await _context.RolePermissions.Where(rp => rp.RoleId == roleId).ToListAsync();
-        }
-
-        public async Task<List<RolePermission>> RemovePermissionFromRole(Guid roleId, Guid permissionId)
-        {
-            var existing = await _context.RolePermissions
-                .FirstOrDefaultAsync(rp => rp.RoleId == roleId && rp.PermissionId == permissionId);
-
-            if (existing != null)
-            {
-                _context.RolePermissions.Remove(existing);
-                await _context.SaveChangesAsync();
-            }
-
-            return await _context.RolePermissions.Where(rp => rp.RoleId == roleId).ToListAsync();
-        }
-
-        public async Task<List<RolePermission>> AssignPermissionsToRole(Guid roleId, IEnumerable<Guid> permissionIds)
-        {
-            var existingPermissions = await _context.RolePermissions
-                .Where(rp => rp.RoleId == roleId && permissionIds.Contains(rp.PermissionId))
-                .Select(rp => rp.PermissionId)
-                .ToListAsync();
-
-            var newPermissions = permissionIds.Except(existingPermissions);
-
-            if (newPermissions.Any())
-            {
-                var rolePermissions = newPermissions.Select(permissionId => new RolePermission
-                {
-                    RoleId = roleId,
-                    PermissionId = permissionId
-                });
-
-                _context.RolePermissions.AddRange(rolePermissions);
-                await _context.SaveChangesAsync();
-            }
-
-            return await _context.RolePermissions.Where(rp => rp.RoleId == roleId).ToListAsync();
-        }
-
-        public async Task<List<RolePermission>> RemovePermissionsFromRole(Guid roleId, IEnumerable<Guid> permissionIds)
-        {
-            var permissionsToRemove = await _context.RolePermissions
-                .Where(rp => rp.RoleId == roleId && permissionIds.Contains(rp.PermissionId))
-                .ToListAsync();
-
-            if (permissionsToRemove.Any())
-            {
-                _context.RolePermissions.RemoveRange(permissionsToRemove);
-                await _context.SaveChangesAsync();
-            }
-
-            return await _context.RolePermissions.Where(rp => rp.RoleId == roleId).ToListAsync();
-        }
-
-        public async Task<List<RolePermission>> GetPermissions(Guid roleId) => await _context.RolePermissions.Where(rp => rp.RoleId == roleId).ToListAsync();
-
+        public async Task<List<Permission>> GetPermissionsByRoleAsync(Guid roleId) => await _context.RolePermissions.Where(rp => rp.RoleId == roleId).Select(rp => rp.Permission).ToListAsync();
         public async Task<List<RoleWithPermissions>> GetRolesAndPermissionsByUserIdAsync(Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
@@ -118,5 +44,33 @@ namespace Repository.Implementations
 
             return rolesWithPermissions;
         }
+        public async Task<AppRole?> GetByIdAsync(Guid roleId) => await _context.Roles.FindAsync(roleId);
+        public async Task<List<Permission>> UpdateRolePermissionsAsync(Guid roleId, IEnumerable<Guid> permissionIds)
+        {
+            var existingPermissions = _context.RolePermissions.Where(rp => rp.RoleId == roleId);
+            _context.RolePermissions.RemoveRange(existingPermissions);
+
+            if (permissionIds.Any())
+            {
+                var newPermissions = permissionIds.Select(permissionId => new RolePermission
+                {
+                    RoleId = roleId,
+                    PermissionId = permissionId
+                });
+
+                await _context.RolePermissions.AddRangeAsync(newPermissions);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return await GetPermissionsByRoleAsync(roleId);
+        }
+        public async Task<RoleWithPermissions?> GetRoleWithPermissionsByIdAsync(Guid roleId) =>await _context.Roles
+                .Where(r => r.Id == roleId)
+                .Include(r => r.RolePermissions)
+                    .ThenInclude(rp => rp.Permission)
+                .ProjectTo<RoleWithPermissions>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+
     }
 }

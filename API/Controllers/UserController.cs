@@ -16,7 +16,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{userId}")]
-        [Authorize(Policy = "readUserById")]
+        [Authorize(Policy = "getUser")]
         public async Task<IActionResult> Get(Guid userId)
         {
             var result = await _userService.GetById(userId);
