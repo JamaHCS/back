@@ -1,4 +1,5 @@
-﻿using Domain.Entities.Roles;
+﻿using Domain.Entities.Global;
+using Domain.Entities.Roles;
 using Microsoft.EntityFrameworkCore;
 using Repository.Context;
 using Repository.Interfaces;
@@ -14,6 +15,13 @@ namespace Repository.Implementations
             _context = context;
         }
 
-        public async Task<IEnumerable<Permission>> GetAllAsync() => await _context.Permissions.ToListAsync();
+        public async Task<Result<List<Permission>>> GetAllAsync()
+        {
+            var permissions = await _context.Permissions.ToListAsync();
+
+            return permissions.Any()
+                ? Result.Ok(permissions, 200)
+                : Result.Failure<List<Permission>>("No se han encontrado permisos.", 404);            
+        }
     }
 }

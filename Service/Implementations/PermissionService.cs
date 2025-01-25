@@ -14,11 +14,6 @@ namespace Service.Implementations
             _permissionRepository = permissionRepository;
         }
 
-        public async Task<Result<IEnumerable<Permission>>> GetAllPermissionsAsync()
-        {
-            IEnumerable<Permission> permissions = await _permissionRepository.GetAllAsync();
-
-            return Result.Ok(permissions, 200);
-        }
+        public async Task<Result<List<Permission>>> GetAllPermissionsAsync() => await _permissionRepository.GetAllAsync();
     }
 }
