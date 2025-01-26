@@ -14,14 +14,12 @@ public class RoleRepository : IRoleRepository
     private readonly AppDbContext _context;
     private readonly IMapper _mapper;
     private readonly UserManager<AppUser> _userManager;
-    private readonly IUserRepository _userRepository;
 
-    public RoleRepository(AppDbContext context, UserManager<AppUser> userManager, IMapper mapper, IUserRepository userRepository)
+    public RoleRepository(AppDbContext context, UserManager<AppUser> userManager, IMapper mapper)
     {
         _context = context;
         _userManager = userManager;
         _mapper = mapper;
-        _userRepository = userRepository;
     }
 
     public async Task<Result<List<RoleDTO>>> GetAllRolesAsync()
@@ -61,11 +59,11 @@ public class RoleRepository : IRoleRepository
 
     public async Task<Result<List<RoleWithPermissions>>> GetRolesAndPermissionsByUserIdAsync(Guid userId)
     {
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-        if (!user.Success) return Result.Failure<List<RoleWithPermissions>>("Usuario no encontrado.", 404);
+        if (user is null) return Result.Failure<List<RoleWithPermissions>>("Usuario no encontrado.", 404);
 
-        var roles = await _userManager.GetRolesAsync(user.Value);
+        var roles = await _userManager.GetRolesAsync(user);
 
         var rolesWithPermissions = await _context.Roles
             .Where(r => roles.Contains(r.Name))

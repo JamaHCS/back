@@ -9,10 +9,10 @@ namespace Domain.Mapping
         public RolesMapping() 
         {
             CreateMap<AppRole, RoleWithPermissions>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src => src.RolePermissions))
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.createdBy, opt => opt.MapFrom(src => src.CreatedBy))
                 .ForMember(dest => dest.updatedBy, opt => opt.MapFrom(src => src.UpdatedBy))
                 .ForMember(dest => dest.createdAt, opt => opt.MapFrom(src => src.CreatedAt))
@@ -24,7 +24,14 @@ namespace Domain.Mapping
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Permission.Name))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Permission.Description));
 
-            CreateMap<AppRole, RoleDTO>();
+            CreateMap<AppRole, RoleDTO>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.createdAt, opt => opt.MapFrom(src => src.CreatedAt))
+                .ForMember(dest => dest.updatedAt, opt => opt.MapFrom(src => src.UpdatedAt))
+                .ForMember(dest => dest.createdBy, opt => opt.MapFrom(src => src.CreatedBy))
+                .ForMember(dest => dest.updatedBy, opt => opt.MapFrom(src => src.UpdatedBy));
         }
     }
 }

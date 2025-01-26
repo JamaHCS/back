@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.Context;
 
@@ -11,9 +12,11 @@ using Repository.Context;
 namespace Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250126071842_addPutRoleUserPermission")]
+    partial class addPutRoleUserPermission
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,8 +142,8 @@ namespace Repository.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "818efc34-cc79-447c-8fcf-f24059256079",
-                            CreatedAt = new DateTime(2025, 1, 26, 8, 1, 45, 838, DateTimeKind.Utc).AddTicks(3837),
+                            ConcurrencyStamp = "b4c51547-6fe1-4320-bf60-14b1cdc4eeaa",
+                            CreatedAt = new DateTime(2025, 1, 26, 7, 18, 40, 762, DateTimeKind.Utc).AddTicks(5969),
                             DateOfBirth = new DateTime(2000, 3, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Deleted = false,
                             Email = "jama@pim.com",
@@ -152,10 +155,10 @@ namespace Repository.Migrations
                             MotherLastName = "",
                             NormalizedEmail = "JAMA@PIM.COM",
                             NormalizedUserName = "JAMA@PIM.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKC2+rO/jFpD6AT+d5lCxWMi0SkGGW/kNG+vluQbgmHR6SxX1R2t0ALzM9uVo3pCXw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEF1i/ZLURQxSePTYtann18z0mmsTQ5Dr/17qxKKzFuUdg+NHfWbER7AsU7uAi4rv+w==",
                             PhoneNumber = "4424051649",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "cf9a1212-d115-4956-b31e-605ee1a1dced",
+                            SecurityStamp = "87d82c49-5d4d-41cc-b470-56f4d7b755d9",
                             TwoFactorEnabled = false,
                             UserName = "jama@pim.com"
                         });
@@ -325,7 +328,7 @@ namespace Repository.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-1000-000000000000"),
-                            CreatedAt = new DateTime(2025, 1, 26, 8, 1, 45, 838, DateTimeKind.Utc).AddTicks(7474),
+                            CreatedAt = new DateTime(2025, 1, 26, 7, 18, 40, 762, DateTimeKind.Utc).AddTicks(9414),
                             Description = "Rol con acceso total a todas las funcionalidades",
                             Name = "SuperUser",
                             NormalizedName = "SUPERUSER"
@@ -643,7 +646,7 @@ namespace Repository.Migrations
                         .IsRequired();
 
                     b.HasOne("Domain.Entities.Auth.AppUser", null)
-                        .WithMany("UserRoles")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -661,8 +664,6 @@ namespace Repository.Migrations
             modelBuilder.Entity("Domain.Entities.Auth.AppUser", b =>
                 {
                     b.Navigation("Logs");
-
-                    b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("Domain.Entities.Log.LogSubject", b =>

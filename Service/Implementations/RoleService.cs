@@ -1,4 +1,5 @@
-﻿using Domain.DTO.Roles;
+﻿using System.Data;
+using Domain.DTO.Roles;
 using Domain.Entities.Global;
 using Domain.Entities.Log;
 using Domain.Entities.Roles;
@@ -22,7 +23,7 @@ public class RoleService : IRoleService
     public async Task<Result<List<RoleWithPermissions>>> GetRolesAndPermissions(Guid userId) => await _roleRepository.GetRolesAndPermissionsByUserIdAsync(userId);
     public async Task<Result<List<PermissionDTO>>> UpdateRolePermissionsAsync(Guid roleId, IEnumerable<Guid> permissionIds)
     {
-        var user = await _userContextService.GetAuthenticatedUserId();
+        var user = await _userContextService.GetAuthenticatedUser();
         var role = await _roleRepository.GetByIdAsync(roleId);
 
         if (!role.Success) return Result.Failure<List<PermissionDTO>>(role.Errors?.ToString(), 404);
@@ -50,7 +51,7 @@ public class RoleService : IRoleService
     public async Task<Result<RoleWithPermissions?>> GetRoleAndPermissionsById(Guid roleId) => await _roleRepository.GetRoleWithPermissionsByIdAsync(roleId);
     public async Task<Result<RoleWithPermissions?>> CreateRoleAsync(CreateRoleDTO createRoleDto)
     {
-        var user = await _userContextService.GetAuthenticatedUserId();
+        var user = await _userContextService.GetAuthenticatedUser();
 
         var role = new AppRole
         {
@@ -64,14 +65,14 @@ public class RoleService : IRoleService
 
         var roleCreated = await _roleRepository.CreateRoleWithPermissionsAsync(role, createRoleDto.PermissionIds);
 
-        if(roleCreated.Success) using (_logger.BeginScope(LogContextManager.ToDictionary(user.Id))) _logger.LogInformation("El rol {role} se ha creado.", role.Name);
+        if(roleCreated.Success) using (_logger.BeginScope(LogContextManager.ToDictionary(user.Id))) _logger.LogInformation("El rol {roleName} se ha creado. \nNuevo:{role}", role.Name, role);
         else using (_logger.BeginScope(LogContextManager.ToDictionary(user.Id))) _logger.LogInformation("Se ha intentado crear un rol con el nombre {role}, pero falló.", role.Name);
 
         return roleCreated;
     }
     public async Task<Result> DeleteRoleAsync(Guid roleId)
     {
-        var user = await _userContextService.GetAuthenticatedUserId();
+        var user = await _userContextService.GetAuthenticatedUser();
         var role = await _roleRepository.GetByIdAsync(roleId);
 
         if(role is null)
@@ -90,11 +91,19 @@ public class RoleService : IRoleService
     public async Task<Result<List<RoleDTO>>> GetAllRolesAsync() => await _roleRepository.GetAllRolesAsync();
     public async Task<Result<RoleDTO>> UpdateRoleAsync(Guid roleId, UpdateRoleDTO request)
     {
-        var userId = await _userContextService.GetAuthenticatedUserId();
-        var result = await _roleRepository.UpdateRoleAsync(roleId, request, userId.Id);
+        var user = await _userContextService.GetAuthenticatedUser();
+        var result = await _roleRepository.UpdateRoleAsync(roleId, request, user.Id);
+        var role = await _roleRepository.GetByIdAsync(roleId);
 
-        if (!result.Success) return Result.Failure<RoleDTO>(result.Errors.ToString() ?? "Hubo un problema al actualizar el rol.", result.Status);
-        
+        if (!result.Success)
+        {
+            using (_logger.BeginScope(LogContextManager.ToDictionary(user.Id))) _logger.LogInformation("Se intentó actualizar el rol {role}, pero falló. {updated}", role.Value.Name, request.ToString());
+
+            return Result.Failure<RoleDTO>(result.Errors.ToString() ?? "Hubo un problema al actualizar el rol.", result.Status);
+        }
+
+        using (_logger.BeginScope(LogContextManager.ToDictionary(user.Id))) _logger.LogInformation("El rol {roleName} se ha modificado. \nOriginal: {role} \nNuevo: {new}", role.Value.Name, role.Value, request);
+
         return result;
     }
 }

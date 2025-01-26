@@ -1,22 +1,29 @@
 ﻿namespace Domain.DTO.Users
 {
-    public record GetUserDTO
+    public class GetUserDTO
     {
-        public Guid Id { get; init; }
-        public string FirstName { get; init; }
-        public string MiddleName { get; init; }
-        public string LastName { get; init; }
-        public string MotherLastName { get; init; }
-        public string Email {  get; init; }
-        public DateTime DateOfBirth { get; init; }
-        public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
-        public Guid? CreatedBy { get; init; }
-        public DateTime? UpdatedAt { get; init; }
-        public Guid? UpdatedBy { get; init; }
-        public DateTime? LastLoginAt { get; init; }
-        public string? DeletedBy { get; init; }
-        public DateTime? DeletedAt { get; init; }
-        public bool Deleted { get; init; }
-        public string PhoneNumber { get; init; }
+        public Guid Id { get; set; }
+        public string FirstName { get; set; }
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public string MotherLastName { get; set; }
+        public string Email {  get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public Guid? CreatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public Guid? UpdatedBy { get; set; }
+        public DateTime? LastLoginAt { get; set; }
+        public string? DeletedBy { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public bool Deleted { get; set; }
+        public string PhoneNumber { get; set; }
+        public List<UserRoleDTO> Roles { get; set; } = new();
+    }
+
+    public class UserRoleDTO
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }
