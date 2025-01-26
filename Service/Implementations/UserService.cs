@@ -19,10 +19,22 @@ namespace Service.Implementations
 
         public async Task<Result<GetUserDTO?>> GetById(Guid id)
         {
-            var user = await _userRepository.GetByIdAsync(id);
+            var userResult = await _userRepository.GetByIdAsync(id);
 
-            if (user is null) return Result.Failure<GetUserDTO?>("El usuario no fue encontrado", null, 404);
-            else return Result.Ok<GetUserDTO?>(_mapper.Map<GetUserDTO>(user), 200);
+            if (!userResult.Success) return Result.Failure<GetUserDTO?>(userResult.Errors?.ToString(), null, userResult.Status);
+
+            var userDto = _mapper.Map<GetUserDTO?>(userResult.Value);
+            
+            return Result.Ok(userDto, 200);
+        }
+
+        public async Task<Result> UpdateLastLoginAsync(Guid userId)
+        {
+            var updateResult = await _userRepository.UpdateLastLoginAsync(userId);
+
+            return updateResult.Success
+                ? Result.Ok(204)
+                : Result.Failure(updateResult.Errors?.ToString(), updateResult.Status);
         }
     }
 }

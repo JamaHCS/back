@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository.Context;
 
@@ -11,9 +12,11 @@ using Repository.Context;
 namespace Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250125201829_updateRolePermissions")]
+    partial class updateRolePermissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,8 +142,8 @@ namespace Repository.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "509f8eb1-46f0-476c-ba99-4c941efacd0a",
-                            CreatedAt = new DateTime(2025, 1, 26, 3, 37, 45, 79, DateTimeKind.Utc).AddTicks(1978),
+                            ConcurrencyStamp = "743c1bf3-8895-44e4-aaae-d26ca269a009",
+                            CreatedAt = new DateTime(2025, 1, 25, 20, 18, 27, 873, DateTimeKind.Utc).AddTicks(3436),
                             DateOfBirth = new DateTime(2000, 3, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Deleted = false,
                             Email = "jama@pim.com",
@@ -152,10 +155,10 @@ namespace Repository.Migrations
                             MotherLastName = "",
                             NormalizedEmail = "JAMA@PIM.COM",
                             NormalizedUserName = "JAMA@PIM.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAELREwQ4pK0b5aWWGaAZcGc18IEmsIccUEe8L9azRngOhXSocWHFnNllwyiFFW9NRVg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEACK1vzyGSBkjvws2MeTrbGdr0gc22kO1fw8CnGaFrFj5D3Vr1wQWaFFV5HbJLdshQ==",
                             PhoneNumber = "4424051649",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "73e6bbd7-db64-4adc-9cd9-f95f9cb643bb",
+                            SecurityStamp = "3e38f278-c0d8-4913-8566-a4ceaccb8684",
                             TwoFactorEnabled = false,
                             UserName = "jama@pim.com"
                         });
@@ -325,7 +328,7 @@ namespace Repository.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-1000-000000000000"),
-                            CreatedAt = new DateTime(2025, 1, 26, 3, 37, 45, 79, DateTimeKind.Utc).AddTicks(5377),
+                            CreatedAt = new DateTime(2025, 1, 25, 20, 18, 27, 873, DateTimeKind.Utc).AddTicks(7340),
                             Description = "Rol con acceso total a todas las funcionalidades",
                             Name = "SuperUser",
                             NormalizedName = "SUPERUSER"
@@ -383,32 +386,25 @@ namespace Repository.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0007-000000000000"),
-                            Description = "Permite crear los roles.",
-                            Name = "postRoles"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0008-000000000000"),
                             Description = "Permite modificar los roles.",
                             Name = "putRoles"
-                        },
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0009-000000000000"),
-                            Description = "Permite eliminar los roles.",
-                            Name = "deleteRoles"
                         });
                 });
 
             modelBuilder.Entity("Domain.Entities.Roles.RolePermission", b =>
                 {
-                    b.Property<Guid>("AppRoleId")
+                    b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PermissionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("AppRoleId", "PermissionId");
+                    b.Property<Guid?>("AppRoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("RoleId", "PermissionId");
+
+                    b.HasIndex("AppRoleId");
 
                     b.HasIndex("PermissionId");
 
@@ -417,38 +413,28 @@ namespace Repository.Migrations
                     b.HasData(
                         new
                         {
-                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0004-000000000000")
                         },
                         new
                         {
-                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0005-000000000000")
                         },
                         new
                         {
-                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0001-000000000000")
                         },
                         new
                         {
-                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0006-000000000000")
                         },
                         new
                         {
-                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0007-000000000000")
-                        },
-                        new
-                        {
-                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
-                            PermissionId = new Guid("00000000-0000-0000-0008-000000000000")
-                        },
-                        new
-                        {
-                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
-                            PermissionId = new Guid("00000000-0000-0000-0009-000000000000")
                         });
                 });
 
@@ -579,15 +565,19 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Domain.Entities.Roles.RolePermission", b =>
                 {
-                    b.HasOne("Domain.Entities.Roles.AppRole", "Role")
+                    b.HasOne("Domain.Entities.Roles.AppRole", null)
                         .WithMany("RolePermissions")
-                        .HasForeignKey("AppRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AppRoleId");
 
                     b.HasOne("Domain.Entities.Roles.Permission", "Permission")
                         .WithMany()
                         .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Roles.AppRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

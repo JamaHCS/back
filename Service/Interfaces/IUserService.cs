@@ -1,5 +1,4 @@
 ﻿using Domain.DTO.Users;
-using Domain.Entities.Auth;
 using Domain.Entities.Global;
 
 namespace Service.Interfaces

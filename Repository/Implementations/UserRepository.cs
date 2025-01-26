@@ -1,4 +1,5 @@
 ﻿using Domain.Entities.Auth;
+using Domain.Entities.Global;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Repository.Context;
@@ -17,18 +18,36 @@ namespace Repository.Implementations
             _context = context;
         }
 
-        public async Task<AppUser?> GetByEmailAsync(string email) => await _userManager.FindByEmailAsync(email);
-        public async Task<AppUser?> GetByIdAsync(Guid userId) => await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
-        public async Task UpdateUserAsync(AppUser user)
+        public async Task<Result<AppUser?>> GetByIdAsync(Guid userId)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            return user is not null
+                ? Result.Ok<AppUser?>(user, 200)
+                : Result.Failure<AppUser?>("El usuario no fue encontrado.", 404);
+        }
+
+        public async Task<Result> UpdateUserAsync(AppUser user)
         {
             _context.Users.Update(user);
-            await _context.SaveChangesAsync();
+            var changes = await _context.SaveChangesAsync();
+
+            return changes > 0
+                ? Result.Ok(204)
+                : Result.Failure("No se pudo actualizar el usuario.", 400);
         }
-        public async Task UpdateLastLoginAsync(Guid userId)
+
+        public async Task<Result> UpdateLastLoginAsync(Guid userId)
         {
-            var user = await GetByIdAsync(userId);
+            var userResult = await GetByIdAsync(userId);
+
+            if (!userResult.Success)
+                return Result.Failure(userResult.Errors?.ToString(), userResult.Status);
+
+            var user = userResult.Value!;
             user.LastLoginAt = DateTime.UtcNow;
-            await UpdateUserAsync(user);
+
+            return await UpdateUserAsync(user);
         }
     }
 }

@@ -14,8 +14,9 @@
         }
 
         public static Result Ok(int httpCode = 200) => new Result(true, null, httpCode);
-        public static Result Failure(string error, int httpCode = 400) => new Result(false, error, httpCode);
+        public static Result<T> Ok<T>(T value, string message, int httpCode = 200) => new Result<T>(value, true, message, httpCode);
         public static Result<T> Ok<T>(T value, int httpCode = 200) => new Result<T>(value, true, null, httpCode);
+        public static Result Failure(string error, int httpCode = 400) => new Result(false, error, httpCode);
         public static Result<T> Failure<T>(string error, int httpCode = 400) => new Result<T>(default, false, error, httpCode);
         public static Result<T> Failure<T>(string error, T value, int httpCode = 400) => new Result<T>(value, false, error, httpCode);
     }

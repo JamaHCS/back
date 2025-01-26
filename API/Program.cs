@@ -71,10 +71,13 @@ try
     builder.Services.AddFluentValidationAutoValidation();
     builder.Services.AddFluentValidationClientsideAdapters();
     builder.Services.addFluentValidations();
+    builder.Services.AddHttpContextAccessor();
+
 
     var app = builder.Build();
 
     app.UseMiddleware<LogContextMiddleware>();
+    app.UseMiddleware<ExceptionMiddleware>();
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseHttpsRedirection();

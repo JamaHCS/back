@@ -1,11 +1,10 @@
-﻿using Domain.DTO.Roles;
+﻿using Domain.Entities.Global;
 using Domain.Entities.Roles;
 
 namespace Repository.Interfaces
 {
     public interface IPermissionRepository
     {
-        Task<Permission?> GetByIdAsync(Guid id);
-        Task<IEnumerable<Permission>> GetAllAsync();
+        public Task<Result<List<Permission>>> GetAllAsync();
     }
 }

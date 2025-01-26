@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Domain.Entities.Global;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
@@ -7,7 +8,6 @@ namespace API.Controllers
     public class ProofOfLifeController : ControllerBase
     {
         [HttpGet("")]
-        public async Task<IActionResult> PoL() => StatusCode(200, "Ok");
-
+        public IActionResult PoL() => StatusCode(200, Result.Ok("Prueba de vida"));
     }
 }

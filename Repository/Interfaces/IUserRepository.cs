@@ -1,14 +1,13 @@
 ﻿
-using Domain.DTO.Roles;
 using Domain.Entities.Auth;
+using Domain.Entities.Global;
 
 namespace Repository.Interfaces
 {
     public interface IUserRepository
     {
-        Task<AppUser?> GetByEmailAsync(string email);
-        Task<AppUser?> GetByIdAsync(Guid userId);
-        Task UpdateUserAsync(AppUser user);
-        Task UpdateLastLoginAsync(Guid userId);
+        Task<Result<AppUser?>> GetByIdAsync(Guid userId);
+        Task<Result> UpdateUserAsync(AppUser user);
+        Task<Result> UpdateLastLoginAsync(Guid userId);
     }
 }

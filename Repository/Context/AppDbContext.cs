@@ -59,12 +59,13 @@ namespace Repository.Context
 
             var permissions = new List<Permission>
             {
-                new Permission { Id = Guid.Parse("00000000-0000-0000-0001-000000000000"), Name = "createUser", Description = "Permite crear usuarios" },
-                new Permission { Id = Guid.Parse("00000000-0000-0000-0002-000000000000"), Name = "readUser", Description = "Permite leer usuarios" },
-                new Permission { Id = Guid.Parse("00000000-0000-0000-0003-000000000000"), Name = "disableUsers", Description = "Permite desactivar usuarios" },
-                new Permission { Id = Guid.Parse("00000000-0000-0000-0004-000000000000"), Name = "readPermissions", Description = "Permite leer los permisos existentes" },
-                new Permission { Id = Guid.Parse("00000000-0000-0000-0005-000000000000"), Name = "readUserById", Description = "Permite leer la información detallada del usuario" },
-                new Permission { Id = Guid.Parse("00000000-0000-0000-0006-000000000000"), Name = "getRolesByUser", Description = "Permite leer los roles y permisos por usuario." }
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0004-000000000000"), Name = "getPermissions", Description = "Permite leer la información de los permisos." },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0005-000000000000"), Name = "getUser", Description = "Permite leer la información detallada del usuario." },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0001-000000000000"), Name = "postUser", Description = "Permite crear usuarios." },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0006-000000000000"), Name = "getRoles", Description = "Permite leer la información de los roles." },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0007-000000000000"), Name = "postRoles", Description = "Permite crear los roles." },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0008-000000000000"), Name = "putRoles", Description = "Permite modificar los roles." },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0009-000000000000"), Name = "deleteRoles", Description = "Permite eliminar los roles." }
             };
 
             var superUserRole = new AppRole
@@ -75,12 +76,6 @@ namespace Repository.Context
                 Description = "Rol con acceso total a todas las funcionalidades",
                 CreatedAt = DateTime.UtcNow
             };
-
-            var rolePermissionsSuperUser = permissions.Select(permissions => new RolePermission
-            {
-                RoleId = superUserRole.Id,
-                PermissionId = permissions.Id
-            }).ToList();
 
             modelBuilder.Entity<LogSubject>(entity =>
             {
@@ -190,13 +185,27 @@ namespace Repository.Context
                 entity.HasData(permissions);
             });
 
+            var rolePermissionsSuperUser = permissions.Select(permissions => new RolePermission
+            {
+                AppRoleId = superUserRole.Id,
+                PermissionId = permissions.Id
+            }).ToList();
+
             modelBuilder.Entity<RolePermission>(entity =>
             {
                 entity.ToTable("RolePermissions");
 
-                entity.HasKey(rp => new { rp.RoleId, rp.PermissionId });
-                entity.HasOne(rp => rp.Role).WithMany().HasForeignKey(rp => rp.RoleId).OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(rp => rp.Permission).WithMany().HasForeignKey(rp => rp.PermissionId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasKey(rp => new { rp.AppRoleId, rp.PermissionId });
+
+                entity.HasOne(rp => rp.Role)
+                    .WithMany(r => r.RolePermissions)
+                    .HasForeignKey(rp => rp.AppRoleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(rp => rp.Permission)
+                    .WithMany()
+                    .HasForeignKey(rp => rp.PermissionId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasData(rolePermissionsSuperUser);
             });
