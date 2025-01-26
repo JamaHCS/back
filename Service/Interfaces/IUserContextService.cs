@@ -4,6 +4,6 @@ namespace Service.Interfaces
 {
     public interface IUserContextService
     {
-        Task<AppUser?> GetAuthenticatedUserId();
+        Task<AppUser?> GetAuthenticatedUser();
     }
 }

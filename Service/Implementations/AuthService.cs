@@ -54,7 +54,7 @@ namespace Service.Implementations
         public async Task<Result<TokenResponse?>> Register(RegisterDTO request)
         {
             var user = _mapper.Map<AppUser>(request);
-            var userLogged = await _userContextService.GetAuthenticatedUserId();
+            var userLogged = await _userContextService.GetAuthenticatedUser();
 
             user.CreatedBy = userLogged.Id;
 

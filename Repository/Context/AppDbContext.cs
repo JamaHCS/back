@@ -62,6 +62,7 @@ namespace Repository.Context
                 new Permission { Id = Guid.Parse("00000000-0000-0000-0004-000000000000"), Name = "getPermissions", Description = "Permite leer la información de los permisos." },
                 new Permission { Id = Guid.Parse("00000000-0000-0000-0005-000000000000"), Name = "getUser", Description = "Permite leer la información detallada del usuario." },
                 new Permission { Id = Guid.Parse("00000000-0000-0000-0001-000000000000"), Name = "postUser", Description = "Permite crear usuarios." },
+                new Permission { Id = Guid.Parse("00000000-0000-0000-0002-000000000000"), Name = "putUserRoles", Description = "Permite modificar los roles de los usuarios." },
                 new Permission { Id = Guid.Parse("00000000-0000-0000-0006-000000000000"), Name = "getRoles", Description = "Permite leer la información de los roles." },
                 new Permission { Id = Guid.Parse("00000000-0000-0000-0007-000000000000"), Name = "postRoles", Description = "Permite crear los roles." },
                 new Permission { Id = Guid.Parse("00000000-0000-0000-0008-000000000000"), Name = "putRoles", Description = "Permite modificar los roles." },
@@ -145,6 +146,19 @@ namespace Repository.Context
             modelBuilder.Entity<IdentityUserRole<Guid>>(entity =>
             {
                 entity.ToTable("UserRoles");
+
+                entity.HasKey(ur => new { ur.UserId, ur.RoleId });
+
+                entity.HasOne<AppUser>()
+                    .WithMany(u => u.UserRoles)
+                    .HasForeignKey(ur => ur.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne<AppRole>()
+                    .WithMany()
+                    .HasForeignKey(ur => ur.RoleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
                 entity.HasData(new IdentityUserRole<Guid>
                 {
                     UserId = jamaUser.Id,

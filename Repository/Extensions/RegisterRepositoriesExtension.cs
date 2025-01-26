@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Repository.Implementations;
 using Repository.Interfaces;
+using Repository.Utils;
 
 namespace Repository.Extensions
 {
@@ -11,6 +12,7 @@ namespace Repository.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IEntityAuditHelper, EntityAuditHelper>();
         }
     }
 }

@@ -16,7 +16,6 @@ namespace Service.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IUserContextService, UserContextService>();
-
         }
     }
 }

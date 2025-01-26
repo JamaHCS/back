@@ -17,7 +17,7 @@ namespace Service.Implementations
             _userRepository = userRepository;
         }
 
-        public async Task<AppUser?> GetAuthenticatedUserId()
+        public async Task<AppUser?> GetAuthenticatedUser()
         {
             var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("sub") ??
                               _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);

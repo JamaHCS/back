@@ -21,5 +21,7 @@ namespace Domain.Entities.Auth
         public bool Deleted { get; set; }
         public string FullName => $"{FirstName} {LastName}";
         public ICollection<LogEvent> Logs { get; set; } = new List<LogEvent>();
+        public ICollection<IdentityUserRole<Guid>> UserRoles { get; set; } = new List<IdentityUserRole<Guid>>();
+
     }
 }
