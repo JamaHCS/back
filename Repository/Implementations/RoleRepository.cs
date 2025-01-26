@@ -24,9 +24,35 @@ public class RoleRepository : IRoleRepository
         _userRepository = userRepository;
     }
 
+    public async Task<Result<List<RoleDTO>>> GetAllRolesAsync()
+    {
+        var roles = await _context.Roles.ProjectTo<RoleDTO>(_mapper.ConfigurationProvider).ToListAsync();
+
+        return Result.Ok(roles, 200);
+    }
+    public async Task<Result<RoleDTO>> UpdateRoleAsync(Guid roleId, UpdateRoleDTO request, Guid updatedBy)
+    {
+        var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
+
+        if (role is null) return Result.Failure<RoleDTO>("Rol no encontrado.", 404);
+
+        role.Name = request.Name;
+        role.NormalizedName = request.Name.ToUpper();
+        role.Description = request.Description;
+        role.UpdatedAt = DateTime.UtcNow;
+        role.UpdatedBy = updatedBy;
+
+        _context.Roles.Update(role);
+        await _context.SaveChangesAsync();
+
+        var roleDTO = _mapper.Map<RoleDTO>(role);
+
+        return Result.Ok(roleDTO, "Rol actualizado correctamente.", 200);
+    }
+
     public async Task<Result<List<Permission>>> GetPermissionsByRoleAsync(Guid roleId)
     {
-        var permissions = await _context.RolePermissions.Where(rp => rp.RoleId == roleId).Select(rp => rp.Permission).ToListAsync();
+        var permissions = await _context.RolePermissions.Where(rp => rp.AppRoleId == roleId).Select(rp => rp.Permission).ToListAsync();
 
         return permissions.Any()
             ? Result.Ok(permissions, 200)
@@ -48,7 +74,7 @@ public class RoleRepository : IRoleRepository
                 .ProjectTo<RoleWithPermissions>(_mapper.ConfigurationProvider)
                 .ToListAsync();
                 
-        return Result.Ok(rolesWithPermissions, 200);
+        return Result.Ok(rolesWithPermissions, rolesWithPermissions.Any() ? 200 : 204);
     }
 
     public async Task<Result<AppRole?>> GetByIdAsync(Guid roleId)
@@ -60,21 +86,32 @@ public class RoleRepository : IRoleRepository
             : Result.Failure<AppRole?>("Rol no encontrado.", 404);
     }
 
-    public async Task<Result<List<Permission>>> UpdateRolePermissionsAsync(Guid roleId, IEnumerable<Guid> permissionIds)
+    public async Task<Result<List<Permission>>> UpdateRolePermissionsAsync(Guid roleId, IEnumerable<Guid> permissionIds, Guid updatedBy)
     {
-        var existingPermissions = _context.RolePermissions.Where(rp => rp.RoleId == roleId);
-        _context.RolePermissions.RemoveRange(existingPermissions);
+        var role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
 
+        if (role == null) return Result.Failure("Rol no encontrado.", new List<Permission>(), 404);
+
+        var existingPermissions = _context.RolePermissions.Where(rp => rp.AppRoleId == roleId);
+        
         if (permissionIds.Any())
         {
+            _context.RolePermissions.RemoveRange(existingPermissions);
+
             var newPermissions = permissionIds.Select(permissionId => new RolePermission
             {
-                RoleId = roleId,
+                AppRoleId = roleId,
                 PermissionId = permissionId
             });
 
             await _context.RolePermissions.AddRangeAsync(newPermissions);
         }
+        else return Result.Failure<List<Permission>>("El rol debe de tener al menos 1 permiso asociado.", 400);
+
+        role.UpdatedAt = DateTime.UtcNow;
+        role.UpdatedBy = updatedBy;
+
+        _context.Roles.Update(role);
 
         await _context.SaveChangesAsync();
 
@@ -97,18 +134,25 @@ public class RoleRepository : IRoleRepository
 
     public async Task<Result<RoleWithPermissions?>> CreateRoleWithPermissionsAsync(AppRole role, IEnumerable<Guid> permissionIds)
     {
-        await _context.Roles.AddAsync(role);
+
+        var existingRole = await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == role.NormalizedName);
+
+        if (existingRole is not null) return Result.Failure<RoleWithPermissions?>("El nombre del rol ya está en uso.", 409);
 
         if (permissionIds.Any())
         {
+            await _context.Roles.AddAsync(role);
+
             var rolePermissions = permissionIds.Select(permissionId => new RolePermission
             {
-                RoleId = role.Id,
+                AppRoleId = role.Id,
                 PermissionId = permissionId
             });
 
             await _context.RolePermissions.AddRangeAsync(rolePermissions);
         }
+        else return Result.Failure<RoleWithPermissions?>("El rol debe de tener al menos 1 permiso asociado.", 400);
+        
 
         await _context.SaveChangesAsync();
 

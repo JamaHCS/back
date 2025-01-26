@@ -1,5 +1,6 @@
 ﻿using Domain.DTO.Roles;
 using Domain.Entities.Global;
+using Domain.Entities.Roles;
 
 namespace Service.Interfaces
 {
@@ -10,5 +11,7 @@ namespace Service.Interfaces
         public Task<Result<RoleWithPermissions?>> GetRoleAndPermissionsById(Guid roleId);
         public Task<Result<RoleWithPermissions?>> CreateRoleAsync(CreateRoleDTO createRoleDto);
         public Task<Result> DeleteRoleAsync(Guid roleId);
+        public Task<Result<List<RoleDTO>>> GetAllRolesAsync();
+        public Task<Result<RoleDTO>> UpdateRoleAsync(Guid roleId, UpdateRoleDTO request);
     }
 }

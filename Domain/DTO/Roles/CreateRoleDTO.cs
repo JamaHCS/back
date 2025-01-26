@@ -20,6 +20,9 @@ namespace Domain.DTO.Roles
             RuleFor(x => x.Description)
                 .NotEmpty().WithMessage("La descripción es obligatoria.")
                 .MaximumLength(250);
+
+            RuleFor(x => x.PermissionIds)
+                .NotEmpty().WithMessage("El rol debe de tener al menos un permiso asociado.");
         }
     }
 }

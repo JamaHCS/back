@@ -12,8 +12,8 @@ using Repository.Context;
 namespace Repository.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250125221559_DeleteRoles")]
-    partial class DeleteRoles
+    [Migration("20250126033746_rolePermission")]
+    partial class rolePermission
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -142,8 +142,8 @@ namespace Repository.Migrations
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "9b427950-af78-4904-ace2-dec65d891aad",
-                            CreatedAt = new DateTime(2025, 1, 25, 22, 15, 57, 981, DateTimeKind.Utc).AddTicks(9083),
+                            ConcurrencyStamp = "509f8eb1-46f0-476c-ba99-4c941efacd0a",
+                            CreatedAt = new DateTime(2025, 1, 26, 3, 37, 45, 79, DateTimeKind.Utc).AddTicks(1978),
                             DateOfBirth = new DateTime(2000, 3, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Deleted = false,
                             Email = "jama@pim.com",
@@ -155,10 +155,10 @@ namespace Repository.Migrations
                             MotherLastName = "",
                             NormalizedEmail = "JAMA@PIM.COM",
                             NormalizedUserName = "JAMA@PIM.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMJhvEG+T3ngEdydu6yKNELrzJw0q4QhkPZTUAtRTN9CF/tpcCiIeK/QVEU4ZZ99qg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELREwQ4pK0b5aWWGaAZcGc18IEmsIccUEe8L9azRngOhXSocWHFnNllwyiFFW9NRVg==",
                             PhoneNumber = "4424051649",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "3d4a66b5-3f04-4ef1-8861-dde0f044ce27",
+                            SecurityStamp = "73e6bbd7-db64-4adc-9cd9-f95f9cb643bb",
                             TwoFactorEnabled = false,
                             UserName = "jama@pim.com"
                         });
@@ -328,7 +328,7 @@ namespace Repository.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-1000-000000000000"),
-                            CreatedAt = new DateTime(2025, 1, 25, 22, 15, 57, 982, DateTimeKind.Utc).AddTicks(3380),
+                            CreatedAt = new DateTime(2025, 1, 26, 3, 37, 45, 79, DateTimeKind.Utc).AddTicks(5377),
                             Description = "Rol con acceso total a todas las funcionalidades",
                             Name = "SuperUser",
                             NormalizedName = "SUPERUSER"
@@ -405,18 +405,13 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Domain.Entities.Roles.RolePermission", b =>
                 {
-                    b.Property<Guid>("RoleId")
+                    b.Property<Guid>("AppRoleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("PermissionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("AppRoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("RoleId", "PermissionId");
-
-                    b.HasIndex("AppRoleId");
+                    b.HasKey("AppRoleId", "PermissionId");
 
                     b.HasIndex("PermissionId");
 
@@ -425,37 +420,37 @@ namespace Repository.Migrations
                     b.HasData(
                         new
                         {
-                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0004-000000000000")
                         },
                         new
                         {
-                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0005-000000000000")
                         },
                         new
                         {
-                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0001-000000000000")
                         },
                         new
                         {
-                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0006-000000000000")
                         },
                         new
                         {
-                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0007-000000000000")
                         },
                         new
                         {
-                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0008-000000000000")
                         },
                         new
                         {
-                            RoleId = new Guid("00000000-0000-0000-1000-000000000000"),
+                            AppRoleId = new Guid("00000000-0000-0000-1000-000000000000"),
                             PermissionId = new Guid("00000000-0000-0000-0009-000000000000")
                         });
                 });
@@ -587,19 +582,15 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Domain.Entities.Roles.RolePermission", b =>
                 {
-                    b.HasOne("Domain.Entities.Roles.AppRole", null)
+                    b.HasOne("Domain.Entities.Roles.AppRole", "Role")
                         .WithMany("RolePermissions")
-                        .HasForeignKey("AppRoleId");
+                        .HasForeignKey("AppRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.Roles.Permission", "Permission")
                         .WithMany()
                         .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.Roles.AppRole", "Role")
-                        .WithMany()
-                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

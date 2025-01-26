@@ -187,7 +187,7 @@ namespace Repository.Context
 
             var rolePermissionsSuperUser = permissions.Select(permissions => new RolePermission
             {
-                RoleId = superUserRole.Id,
+                AppRoleId = superUserRole.Id,
                 PermissionId = permissions.Id
             }).ToList();
 
@@ -195,9 +195,17 @@ namespace Repository.Context
             {
                 entity.ToTable("RolePermissions");
 
-                entity.HasKey(rp => new { rp.RoleId, rp.PermissionId });
-                entity.HasOne(rp => rp.Role).WithMany().HasForeignKey(rp => rp.RoleId).OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(rp => rp.Permission).WithMany().HasForeignKey(rp => rp.PermissionId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasKey(rp => new { rp.AppRoleId, rp.PermissionId });
+
+                entity.HasOne(rp => rp.Role)
+                    .WithMany(r => r.RolePermissions)
+                    .HasForeignKey(rp => rp.AppRoleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(rp => rp.Permission)
+                    .WithMany()
+                    .HasForeignKey(rp => rp.PermissionId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasData(rolePermissionsSuperUser);
             });

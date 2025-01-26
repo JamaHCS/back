@@ -1,5 +1,6 @@
 ﻿using API.Authorization;
 using Domain.Entities.Auth;
+using Domain.Entities.Global;
 using Domain.Entities.Roles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -67,6 +68,30 @@ namespace API.Extensions
                     ValidIssuer = configuration["Jwt:Issuer"],
                     ValidAudience = configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? "test_key_default"))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        context.Response.ContentType = "application/json";
+                        context.Response.StatusCode = 401;
+
+                        var result = Result.Failure("Autorización inválida o expirada.", 401);
+
+                        return context.Response.WriteAsJsonAsync(result);
+                    },
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+
+                        context.Response.ContentType = "application/json";
+                        context.Response.StatusCode = 401;
+
+                        var result = Result.Failure("Autenticación requerida. Por favor, inicia sesión.", 401);
+
+                        return context.Response.WriteAsJsonAsync(result);
+                    }
                 };
             });
 

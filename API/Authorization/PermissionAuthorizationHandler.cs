@@ -46,7 +46,7 @@ namespace API.Authorization
             {
                 hasPermission = await _context.RolePermissions
                     .Include(rp => rp.Permission)
-                    .AnyAsync(rp => rp.RoleId == roleId && rp.Permission.Name == requirement.PermissionName);
+                    .AnyAsync(rp => rp.AppRoleId == roleId && rp.Permission.Name == requirement.PermissionName);
 
                 if (hasPermission) break;
             }

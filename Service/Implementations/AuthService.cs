@@ -17,14 +17,16 @@ namespace Service.Implementations
         private readonly IMapper _mapper;
         private readonly ILogger<AuthService> _logger;
         private readonly IUserRepository _userRepository;
+        private readonly IUserContextService _userContextService;
 
-        public AuthService(UserManager<AppUser> userManager, IJwtGenerator jwtGenerator, IMapper mapper, ILogger<AuthService> logger, IUserRepository userRepository)
+        public AuthService(UserManager<AppUser> userManager, IJwtGenerator jwtGenerator, IMapper mapper, ILogger<AuthService> logger, IUserRepository userRepository, IUserContextService userContextService)
         {
             _userManager = userManager;
             _jwtGenerator = jwtGenerator;
             _mapper = mapper;
             _logger = logger;
             _userRepository = userRepository;
+            _userContextService = userContextService;
         }
 
         public async Task<Result<TokenResponse?>> Login(LoginDTO request)
@@ -52,6 +54,9 @@ namespace Service.Implementations
         public async Task<Result<TokenResponse?>> Register(RegisterDTO request)
         {
             var user = _mapper.Map<AppUser>(request);
+            var userLogged = await _userContextService.GetAuthenticatedUserId();
+
+            user.CreatedBy = userLogged.Id;
 
             var result = await _userManager.CreateAsync(user, request.Password);
 
@@ -59,14 +64,16 @@ namespace Service.Implementations
             {
                 using (_logger.BeginScope(LogContextManager.ToDictionary())) _logger.LogInformation("Registro fallido: {Email}", user.Email);
 
-                return Result.Failure<TokenResponse?>("Registro fallido", 400);
+                return Result.Failure<TokenResponse?>($"Registro fallido: {result.Errors.ToString()}", 400);
             }
 
             var token = _jwtGenerator.GenerateToken(user);
 
             using (_logger.BeginScope(LogContextManager.ToDictionary(user.Id))) _logger.LogInformation("Usuario {UserEmail} registrado", user.Email);
 
-            return Result.Ok<TokenResponse?>(new TokenResponse { Token = token }, 200);
+            var userCreated = await _userManager.FindByEmailAsync(user.Email);
+
+            return Result.Ok<TokenResponse?>(new TokenResponse { Token = token, UserId = userCreated.Id }, 200);
         }
     }
 }

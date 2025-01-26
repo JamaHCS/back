@@ -19,10 +19,17 @@ namespace API.Middlewares
             }
             catch (Exception ex)
             {
-                context.Response.StatusCode = 500;
                 context.Response.ContentType = "application/json";
 
-                await context.Response.WriteAsJsonAsync(Result.Failure(ex.Message, 500));
+                var response = ex switch
+                {
+                    UnauthorizedAccessException => Result.Failure("Token inválido o permisos insuficientes", ex.Message, 401),
+                    _ => Result.Failure("Ocurrió un error inesperado.", ex.Message, 500)
+                };
+
+                context.Response.StatusCode = response.Status;
+
+                await context.Response.WriteAsJsonAsync(response);
             }
         }
     }

@@ -25,6 +25,24 @@ namespace API.Controllers
             return StatusCode(result.Status, result);
         }
 
+        [HttpGet("")]
+        [Authorize(Policy = "getRoles")]
+        public async Task<IActionResult> GetAllRoles()
+        {
+            var result = await _roleService.GetAllRolesAsync();
+
+            return StatusCode(result.Status, result);
+        }
+
+        [HttpPut("{roleId}")]
+        [Authorize(Policy = "putRoles")]
+        public async Task<IActionResult> UpdateRole(Guid roleId, [FromBody] UpdateRoleDTO updateRoleDto)
+        {
+            var result = await _roleService.UpdateRoleAsync(roleId, updateRoleDto);
+
+            return StatusCode(result.Status, result);
+        }
+
         [HttpGet("by-user/{userId}")]
         [Authorize(Policy = "getRoles")]
         public async Task<IActionResult> GetRolesByUser(Guid userId)
