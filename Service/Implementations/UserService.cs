@@ -55,5 +55,12 @@ namespace Service.Implementations
             return Result.Ok(usersResult.Value, 200);
         }
 
+        public async Task<Result<GetUserDTO?>> GetMyUserAsync()
+        {
+            var user = await _userContextService.GetAuthenticatedUser();
+
+            return await _userRepository.GetByIdWithRolesAsync(user.Id);
+        }
+
     }
 }

@@ -42,5 +42,14 @@ namespace API.Controllers
 
             return StatusCode(result.Status, result);
         }
+
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetMyUser()
+        {
+            var result = await _userService.GetMyUserAsync();
+
+            return StatusCode(result.Status, result);
+        }
     }
 }

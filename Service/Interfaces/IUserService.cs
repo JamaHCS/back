@@ -9,5 +9,6 @@ namespace Service.Interfaces
         Task<Result<GetUserDTO?>> GetById(Guid id);
         Task<Result<List<RoleDTO>>> UpdateUserRolesAsync(Guid userId, IEnumerable<Guid> roleIds);
         Task<Result<List<GetUserDTO>>> GetAllUsersAsync();
+        Task<Result<GetUserDTO?>> GetMyUserAsync();
     }
 }
