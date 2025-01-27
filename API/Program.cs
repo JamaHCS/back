@@ -12,6 +12,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using System.Globalization;
 using API.Middlewares;
+using Domain.Entities.Global;
 
 CultureInfo cultureInfo = new CultureInfo("es");
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -60,6 +61,11 @@ try
 {
     Log.Information("Starting web host");
     builder.Host.UseSerilog();
+
+    var apiVersion = builder.Configuration["ApiVersion"] ?? "0.0.1";
+
+    Result.SetApiVersion(apiVersion);
+
 
     builder.Services.addAutoMappers();
     builder.Services.AddConnection(configuration);
