@@ -5,12 +5,16 @@
         public bool Success { get; set; }
         public object? Errors { get; set; }
         public int Status { get; set; }
+        public string Version { get; set; }
+
+        private static string _apiVersion = "unknown";
 
         public Result(bool success, string? error, int code)
         {
             Success = success;
             Errors = error;
             Status = code;
+            Version = _apiVersion;
         }
 
         public static Result Ok(int httpCode = 200) => new Result(true, null, httpCode);
@@ -19,6 +23,11 @@
         public static Result Failure(string error, int httpCode = 400) => new Result(false, error, httpCode);
         public static Result<T> Failure<T>(string error, int httpCode = 400) => new Result<T>(default, false, error, httpCode);
         public static Result<T> Failure<T>(string error, T value, int httpCode = 400) => new Result<T>(value, false, error, httpCode);
+
+        public static void SetApiVersion(string version)
+        {
+            _apiVersion = version;
+        }
     }
 
     public class Result<T> : Result
