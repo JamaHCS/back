@@ -18,7 +18,7 @@ namespace API.Extensions
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
+                options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequiredLength = 8;
@@ -58,6 +58,8 @@ namespace API.Extensions
             {
                 options.RequireHttpsMetadata = true;
                 options.SaveToken = true;
+
+                var expires = DateTime.UtcNow.AddMinutes(double.Parse(configuration["Jwt:ExpiresInMinutes"] ?? "60"));
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
